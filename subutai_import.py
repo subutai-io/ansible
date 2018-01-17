@@ -39,8 +39,8 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-original_message:
-    description: The original name param that was passed in
+container:
+    description: Container affected
     type: str
 message:
     description: The output message that the sample module generates
