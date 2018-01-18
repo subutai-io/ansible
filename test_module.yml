@@ -16,3 +16,13 @@
     - name: dump test output
       debug:
         msg: '{{ testout }}'
+
+    - name: run subutai destroy nginx
+      subutai_destroy:
+        container: 'nginx'
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
