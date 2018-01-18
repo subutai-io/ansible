@@ -1,8 +1,12 @@
 # ansible
 Plugins and Drivers for Subutai Integration
--------------------------------------------
+===========================================
+
 
 How to run: 
+-----------
+
+Inside this module directory, run: 
 
 `ansible-playbook --module-path . test_module.yml -i ./hosts`
 
