@@ -27,6 +27,17 @@
       debug:
         msg: '{{ testout }}'
 
+    - name: run subutai stop management
+      subutai_stop:
+        container: 'management'
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+
     - name: run subutai start management
       subutai_start:
         container: 'management'
