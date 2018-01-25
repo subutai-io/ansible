@@ -180,3 +180,14 @@
         container: debian
         newname: debian-test 
       become: true
+
+    - name: restore debian backup tp container
+      subutai_restore:
+        backupname: debian
+        container: new_debian
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
