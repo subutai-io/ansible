@@ -90,8 +90,8 @@ def run_module():
         env='', 
         child='',
         ipaddr='', 
-        token=''
-        kurjun_token=''
+        token='',
+        kurjun_token='',
     )
 
     module = AnsibleModule(
@@ -121,7 +121,7 @@ def run_module():
         args += " --token " + module.params['token']
 
     if module.params['kurjun_token']:
-        args += " --kurjun_token " + module.params['kurjun_tokenenv']
+        args += " --kurjun_token " + module.params['kurjun_token']
 
     out = subprocess.Popen(["/snap/bin/subutai","clone", module.params['parent'], module.params['child'] , args ], stdout=subprocess.PIPE).stdout.read()
     
