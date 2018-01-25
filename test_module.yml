@@ -162,4 +162,16 @@
       subutai_export:
         container: debian
       become: true
+    
+    - name: rename debian template to debian-test
+      subutai_rename:
+        container: debian
+        newname: debian-test 
+      become: true
+
+    - name: rename debian-test template to debian
+      subutai_rename:
+        container: debian-test
+        newname: debian
+      become: true
 
