@@ -64,8 +64,8 @@ def run_module():
     # parameters
     module_args = dict(
         container=dict(type='str', required=True),
-        ipaddr=dict(type='str', required=True),
-        vlan=dict(type='str', required=True),
+        ipaddr=dict(type='str', required=False),
+        vlan=dict(type='str', required=False),
     )
 
     # skell to result
