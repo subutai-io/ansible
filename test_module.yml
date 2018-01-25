@@ -61,3 +61,16 @@
         msg: '{{ testout }}'
 
 
+    - name: clone management
+      subutai_clone:
+        parent: 'management'
+        child: 'management-test'
+
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+
