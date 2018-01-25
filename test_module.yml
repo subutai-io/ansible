@@ -83,4 +83,15 @@
       debug:
         msg: '{{ testout }}'
 
+    - name: update container
+      subutai_update:
+        container: management
+      become: true
+      register: testout
+
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
 
