@@ -158,3 +158,8 @@
           container: management
       become: true
 
+    - name: export debian temaplate
+      subutai_export:
+        container: debian
+      become: true
+
