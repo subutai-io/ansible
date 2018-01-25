@@ -94,4 +94,28 @@
       debug:
         msg: '{{ testout }}'
 
+    - name: checkpoint container
+      subutai_checkpoint:
+        container: 'management'
+        stop_container: true
+    
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: restore checkpoint container
+      subutai_checkpoint:
+        container: 'management'
+        restore: True
+
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
 
