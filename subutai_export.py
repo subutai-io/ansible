@@ -121,7 +121,7 @@ def run_module():
     if module.params['description']:
         args += " -d " + module.params['description']    
     if module.params['private']:
-        args += " -p " + module.params['private']
+        args += " -p " + str(module.params['private'])
 
 
     err = subprocess.Popen(["/snap/bin/subutai","export", module.params['container'], args ], stderr=subprocess.PIPE).stderr.read()
