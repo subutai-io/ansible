@@ -48,3 +48,16 @@
       debug:
         msg: '{{ testout }}'
 
+    - name: backup management
+      subutai_backup:
+        container: 'management'
+        full_backup: true 
+        stop_container: true
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+
