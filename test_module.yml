@@ -73,4 +73,14 @@
       debug:
         msg: '{{ testout }}'
 
+    - name: cleanup enviroment
+      subutai_cleanup:
+
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
 
