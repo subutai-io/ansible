@@ -118,4 +118,33 @@
       debug:
         msg: '{{ testout }}'
 
+    - name: config container
+      subutai_config:
+        container: 'management'
+        operation: add 
+        key: foo 
+        value: bar 
+    
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: delete config container
+      subutai_config:
+        container: 'management'
+        operation: 'del'
+        key: 'foo'
+        value: 'bar'
+
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+
 
