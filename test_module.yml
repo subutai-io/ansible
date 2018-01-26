@@ -188,6 +188,15 @@
       become: true
       register: testout
 
+    - name: set quota nginx container
+      subutai_quota:
+        container: debian
+        resource: cpu 
+        set: 84
+        threshold: 74
+      become: true
+      register: testout
+
     - name: dump test output
       debug:
         msg: '{{ testout }}'
