@@ -348,3 +348,51 @@
     - name: dump test output
       debug:
         msg: '{{ testout }}'
+        
+    - name: subutai tunnel add 10.10.0.20
+      subutai_tunnel:
+        command: add
+        ipaddr: 10.10.0.20
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: subutai tunnel add 10.10.0.30:8080 300 -g
+      subutai_tunnel:
+        command: add
+        ipaddr: 10.10.0.30:8080
+        ttl: 300
+        globalFlag: true
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: subutai tunnel del 10.10.0.30:8080
+      subutai_tunnel:
+        command: delete
+        ipaddr: 10.10.0.30:8080
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+
+
+    - name: subutai tunnel del 10.10.0.20:8080
+      subutai_tunnel:
+        command: delete
+        ipaddr: 10.10.0.20:22
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
