@@ -8,14 +8,14 @@ ANSIBLE_METADATA = {
 
 DOCUMENTATION = '''
 ---
-module: subutai_config
+module: subutai_map
 
-short_description: subutai config module
+short_description: subutai map module
 
 version_added: "2.5"
 
 description:
-    - "configure containers in subutai"
+    - "configure network map for containers in subutai"
 
 options:
     protocol:
@@ -172,7 +172,7 @@ def run_module():
     else:
         result['changed'] = True
         module.exit_json(**result)
-        
+
 def main():
     run_module()
 
