@@ -56,17 +56,47 @@ author:
 '''
 
 EXAMPLES = '''
-# config container
-  - name: map container's 172.16.31.3 port 3306 to the random port on RH
-    subutai_map:
-      protocol: tcp
-      internal: 172.16.31.3:3306 
+# p2p module
+    - name: create p2p instance 
+      subutai_p2p:
+        command: create
+        interface: p2p-net1
+        hash: swarm-12345678-abcd-1234-efgh-123456789012
+        key: 0123456789qwertyu0123456789zxcvbn
+        ttl: 1476870551
+        localPeepIPAddr: 10.220.22.1
+        portrange: 0-65535
 
-  - name: add 172.16.31.4:3306 to the same group
-    subutai_map:
-      protocol: tcp
-      internal: 172.16.31.4:3306
-      external: 46558
+      become: true
+      register: testout
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: update p2p instance 
+      subutai_p2p:
+        command: update
+        interface: p2p-net1
+        hash: swarm-12345678-abcd-1234-efgh-123456789012
+        key: 0123456789qwertyu0123456789zxcvbn
+        ttl: 1476870551
+
+      become: true
+      register: testout
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: delete p2p instance 
+      subutai_p2p:
+        command: delete
+        hash: swarm-12345678-abcd-1234-efgh-123456789012
+
+      become: true
+      register: testout
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
 
 '''
 
