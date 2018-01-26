@@ -302,3 +302,49 @@
     - name: dump test output
       debug:
         msg: '{{ testout }}'
+
+    - name: add domain example.com to 100 vlan
+      subutai_proxy:
+        command: add
+        vlan: 100
+        domain: example.com
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: add domain example.com to 100 vlan
+      subutai_proxy:
+        command: add
+        vlan: 100
+        host: 10.10.0.20
+      become: true
+      register: testout
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: delete domain example.com
+      subutai_proxy:
+        command: delete
+        vlan: 100
+        domain: example.com
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: delete host 10.10.0.20
+      subutai_proxy:
+        command: delete
+        vlan: 100
+        host: 10.10.0.20
+      become: true
+      register: testout
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
