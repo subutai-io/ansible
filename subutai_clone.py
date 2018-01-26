@@ -110,20 +110,24 @@ def run_module():
     result['token'] = module.params['token']
     result['kurjun_token'] =  module.params['kurjun_token']
 
-    args= ""
+    args=[]
     if module.params['env']:
-        args += " --env " + module.params['env']
+        args.append("--env")
+        args.append(module.params['env'])
 
     if module.params['ipaddr']:
-        args += " --ipaddr " + module.params['ipaddr']
+        args.append("--ipaddr")
+        args.append(module.params['ipaddr'])
 
     if module.params['token']:
-        args += " --token " + module.params['token']
+        args.append("--token")
+        args.append(module.params['token'])
 
     if module.params['kurjun_token']:
-        args += " --kurjun_token " + module.params['kurjun_token']
+        args.append("--kurjun_token")
+        args.append(module.params['kurjun_token'])
 
-    out = subprocess.Popen(["/snap/bin/subutai","clone", module.params['parent'], module.params['child'] , args ], stdout=subprocess.PIPE).stdout.read()
+    out = subprocess.Popen(["/snap/bin/subutai","clone", module.params['parent'], module.params['child']] + args, stdout=subprocess.PIPE).stdout.read()
     
     result['changed'] = True
 

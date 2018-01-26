@@ -80,12 +80,13 @@ def run_module():
     result['container'] = module.params['container']
     result['source'] =  module.params['source']
 
-    args= ""
+    args=[]
     if module.params['source']:
-        args += " -s " + module.params['source']
+        args.append("-s")
+        args.append(module.params['source'])
 
     if not is_promoted(module.params['container']):
-        err = subprocess.Popen(["/snap/bin/subutai","promote",module.params['container'], args ], stderr=subprocess.PIPE).stderr.read()
+        err = subprocess.Popen(["/snap/bin/subutai","promote",module.params['container']] + args, stderr=subprocess.PIPE).stderr.read()
         if err:
             result['changed'] = False
             module.fail_json(msg='[Err] ' + err, **result)
@@ -95,7 +96,6 @@ def run_module():
         result['changed'] = False
         result['message'] = "Already promoted" 
         
-    
     module.exit_json(**result)
 
 def is_promoted(container):

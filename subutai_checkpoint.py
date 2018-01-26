@@ -91,22 +91,20 @@ def run_module():
     result['restore'] =  module.params['restore']
     result['stop_container'] = module.params['stop_container']
 
-    args= ""
+    args=[]
     if module.params['restore']:
-        args += " -r"
+        args.append("-r")
     
     if module.params['stop_container']:
-        args += " -s"
+        args.append("-s")
 
-    out = subprocess.Popen(["/snap/bin/subutai","checkpoint", module.params['container'], args ], stdout=subprocess.PIPE).stdout.read()
+    out = subprocess.Popen(["/snap/bin/subutai","checkpoint", module.params['container']] + args, stdout=subprocess.PIPE).stdout.read()
     
     if "Failed" in out:
         result['changed'] = False
-        result['message'] = "/snap/bin/subutai checkpoint " + module.params['container'] +  args
+        result['message'] = "/snap/bin/subutai checkpoint " + module.params['container'] +  str(args)
         module.fail_json(msg='[Err] ' + out, **result)
         
-    #result['message'] = 
-
     module.exit_json(**result)
 
 def main():

@@ -164,7 +164,7 @@ def run_module():
     elif module.params['command'] == "delete":
         args.append("-d")
     else:
-        module.fail_json(msg='[Err] ' + err + str(args), **result)
+        module.fail_json(msg='[Err] ' + str(args), **result)
 
     if module.params['interface']:
         args.append(module.params['interface']) 

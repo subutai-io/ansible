@@ -111,20 +111,30 @@ def run_module():
     result['description'] = module.params['description']
     result['private'] = module.params['private']
 
-    args= ""
+    args=[]
+
     if module.params['version']:
-        args += " -v " + module.params['version']
+        args.append("-v")
+        args.append(module.params['version'])
+
     if module.params['size']:
-        args += " -s " + module.params['size']    
+        args.append("-s")
+        args.append(module.params['size'])
+
     if module.params['token']:
-        args += " -t " + module.params['token']
+        args.append("-t")
+        args.append(module.params['token'])
+
     if module.params['description']:
-        args += " -d " + module.params['description']    
+        args.append("-d")
+        args.append(module.params['description'])
+
     if module.params['private']:
-        args += " -p " + str(module.params['private'])
+        args.append("-p")
+        args.append(str(module.params['private']))
 
 
-    err = subprocess.Popen(["/snap/bin/subutai","export", module.params['container'], args ], stderr=subprocess.PIPE).stderr.read()
+    err = subprocess.Popen(["/snap/bin/subutai","export", module.params['container']] + args, stderr=subprocess.PIPE).stderr.read()
     if err:
         result['changed'] = False
         module.fail_json(msg='[Err] ' + err, **result)
@@ -132,9 +142,6 @@ def run_module():
     result['changed'] = True
         
     module.exit_json(**result)
-
-def get_config(container):
-    return subprocess.Popen(["/snap/bin/subutai","config",container], stdout=subprocess.PIPE).stdout.read()
 
 def main():
     run_module()

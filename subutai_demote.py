@@ -90,15 +90,17 @@ def run_module():
     result['ipaddr'] =  module.params['ipaddr']
     result['vlan'] = module.params['vlan']
 
-    args= ""
+    args=[]
     if module.params['ipaddr']:
-        args += " -i " + module.params['ipaddr']
+        args.append("-i")
+        args.append(module.params['ipaddr'])
     
     if module.params['vlan']:
-        args += " -v " + module.params['vlan']
+        args.append("-v")
+        args.append(module.params['vlan'])
 
     if not is_demoted(module.params['container']):
-        err = subprocess.Popen(["/snap/bin/subutai","demote",module.params['container'], args ], stderr=subprocess.PIPE).stderr.read()
+        err = subprocess.Popen(["/snap/bin/subutai","demote",module.params['container']] + args, stderr=subprocess.PIPE).stderr.read()
         if err:
             result['changed'] = False
             module.fail_json(msg='[Err] ' + err, **result)
@@ -108,7 +110,6 @@ def run_module():
         result['changed'] = False
         result['message'] = "Already demoted" 
         
-    
     module.exit_json(**result)
 
 def is_demoted(container):

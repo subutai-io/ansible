@@ -91,18 +91,17 @@ def run_module():
     result['full_backup'] =  module.params['full_backup']
     result['stop_container'] = module.params['stop_container']
 
-    args= ""
+    args=[]
     if module.params['full_backup']:
-        args += " -f"
+        args.append("-f")
     
     if module.params['stop_container']:
-        args += " -s"
+        args.append("-s")
 
-    out = subprocess.Popen(["/snap/bin/subutai","backup", module.params['container'], args ], stdout=subprocess.PIPE).stdout.read()
+    out = subprocess.Popen(["/snap/bin/subutai","backup", module.params['container']] + args, stdout=subprocess.PIPE).stdout.read()
     
     result['changed'] = True
       
-
     module.exit_json(**result)
 
 def main():

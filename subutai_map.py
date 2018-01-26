@@ -62,7 +62,7 @@ author:
 '''
 
 EXAMPLES = '''
-# config container
+# config map
   - name: map container's 172.16.31.3 port 3306 to the random port on RH
     subutai_map:
       protocol: tcp

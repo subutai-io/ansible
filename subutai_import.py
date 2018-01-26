@@ -22,6 +22,18 @@ options:
         description:
             - name of container
         required: true
+    torrent:
+        description:
+            - use BitTorrent for downloading (experimental)
+        required: false
+    version:
+        description:
+            - template version
+        required: false
+    token:
+        description:
+            - token to access private repo
+        required: false
 
 extends_documentation_fragment
     - subutai
@@ -54,12 +66,19 @@ def run_module():
     # parameters
     module_args = dict(
         container=dict(type='str', required=True),
+        torrent=dict(type='bool', required=False),
+        version=dict(type='str', required=False),
+        token=dict(type='str', required=False),
+
     )
 
     # skell to result
     result = dict(
         changed=False,
         container='',
+        torrent='',
+        version='',
+        token='',
         message=''
     )
 
@@ -73,7 +92,23 @@ def run_module():
         return result
 
     result['container'] = module.params['container']
+    result['torrent'] = module.params['torrent']
+    result['version'] = module.params['version']
+    result['token'] = module.params['token']
     
+    args=[]
+
+    if module.params['torrent']:
+        args.append("--torrent")
+
+    if module.params['version']:
+        args.append("-v")
+        args.append(module.params['version'])
+
+    if module.params['token']:
+        args.append("-t")
+        args.append(module.params['token'])
+
     # verify if container is already installed
     out = subprocess.Popen(["/snap/bin/subutai","list"], stdout=subprocess.PIPE).stdout.read()
     if bytes(module.params['container']) in out:
@@ -82,7 +117,7 @@ def run_module():
         
     else: 
         # try install container
-        err_msg = subprocess.Popen(["/snap/bin/subutai","import", module.params['container']], stderr=subprocess.PIPE).stderr.read()
+        err_msg = subprocess.Popen(["/snap/bin/subutai","import", module.params['container']] + args, stderr=subprocess.PIPE).stderr.read()
         if err_msg:
             result['message'] = '[Err] ' + err_msg
             result['changed'] = False

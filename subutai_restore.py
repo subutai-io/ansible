@@ -90,14 +90,15 @@ def run_module():
     result['backupname'] =  module.params['backupname']
     result['date'] = module.params['date']
 
-    args= ""
+    args=[]
     if module.params['date']:
-        args += " -d " + module.params['date']
+        args.append("-d")
+        args.append(module.params['date'])
 
-    err = subprocess.Popen(["/snap/bin/subutai","restore", module.params['backupname'], "-c",  module.params['container'], args ], stderr=subprocess.PIPE).stderr.read()
+    err = subprocess.Popen(["/snap/bin/subutai","restore", module.params['backupname'], "-c",  module.params['container']] + args , stderr=subprocess.PIPE).stderr.read()
     if err:
         result['changed'] = False
-        module.fail_json(msg='[Err] ' + "/snap/bin/subutai " + " restore " + module.params['backupname'] + args + err, **result)
+        module.fail_json(msg='[Err] ' + err, **result)
 
     result['changed'] = True
     result['message'] = err 

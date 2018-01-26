@@ -28,7 +28,6 @@ EXAMPLES = '''
 # cleanup enviroment
 - name: cleanup enviroment
   subutai_cleanup:
-    container: management
 
 '''
 
