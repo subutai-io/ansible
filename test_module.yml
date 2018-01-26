@@ -348,7 +348,7 @@
     - name: dump test output
       debug:
         msg: '{{ testout }}'
-        
+
     - name: subutai tunnel add 10.10.0.20
       subutai_tunnel:
         command: add
@@ -390,6 +390,31 @@
       subutai_tunnel:
         command: delete
         ipaddr: 10.10.0.20:22
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: adding subutai vxlan tunnel
+      subutai_vxlan:
+        command: create
+        name: vxlan1
+        remoteip: 10.220.22.2
+        vlan: 100
+        vni: 12345
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: adding subutai vxlan tunnel
+      subutai_vxlan:
+        command: delete
+        name: vxlan1
       become: true
       register: testout
 
