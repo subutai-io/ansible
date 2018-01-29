@@ -98,8 +98,10 @@ def run_module():
     if module.params['stop_container']:
         args.append("-s")
 
-    out = subprocess.Popen(["/snap/bin/subutai","backup", module.params['container']] + args, stdout=subprocess.PIPE).stdout.read()
-    
+    err = subprocess.Popen(["/snap/bin/subutai","backup", module.params['container']] + args, stderr=subprocess.PIPE).stderr.read()
+    if err:
+        module.fail_json(msg='[Err] ' + err , **result)
+
     result['changed'] = True
       
     module.exit_json(**result)
