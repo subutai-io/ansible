@@ -1,0 +1,423 @@
+---
+- name: test subutai module
+  
+  hosts: localhost
+  port: 2222
+  remote_user: subutai
+
+
+  tasks:
+    - name: run subutai import nginx
+      subutai_import:
+        container: 'nginx'
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: run subutai destroy nginx
+      subutai_destroy:
+        container: 'nginx'
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: run subutai stop management
+      subutai_stop:
+        container: 'management'
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+
+    - name: run subutai start management
+      subutai_start:
+        container: 'management'
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: backup management
+      subutai_backup:
+        container: 'management'
+        full_backup: true 
+        stop_container: true
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+
+    - name: clone management
+      subutai_clone:
+        parent: 'management'
+        child: 'management-test'
+
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: cleanup enviroment
+      subutai_cleanup:
+
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: update container
+      subutai_update:
+        container: management
+      become: true
+      register: testout
+
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: checkpoint container
+      subutai_checkpoint:
+        container: 'management'
+        stop_container: true
+    
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: restore checkpoint container
+      subutai_checkpoint:
+        container: 'management'
+        restore: True
+
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: config container
+      subutai_config:
+        container: 'management'
+        operation: add 
+        key: foo 
+        value: bar 
+    
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: delete config container
+      subutai_config:
+        container: 'management'
+        operation: 'del'
+        key: 'foo'
+        value: 'bar'
+
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: demote management template
+      subutai_demote:
+        container: management
+        ipaddr: 192.168.1.1/24
+        vlan: foo
+      become: true
+
+    - name: promote management template
+      subutai_promote:
+          container: management
+      become: true
+
+    - name: export debian temaplate
+      subutai_export:
+        container: debian
+      become: true
+    
+    - name: rename debian template to debian-test
+      subutai_rename:
+        container: debian
+        newname: debian-test 
+      become: true
+
+    - name: rename debian-test template to debian
+      subutai_rename:
+        container: debian-test
+        newname: debian
+      become: true
+
+    - name: hostname debian template
+      subutai_hostname:
+        container: debian
+        newname: debian-test 
+      become: true
+
+    - name: restore debian backup tp container
+      subutai_restore:
+        backupname: debian
+        container: new_debian
+      become: true
+      register: testout
+
+    - name: set quota nginx container
+      subutai_quota:
+        container: debian
+        resource: cpu 
+        set: 84
+        threshold: 74
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: map container's 172.16.31.3 port 3306 to the random port on RH
+      subutai_map:
+        protocol: tcp
+        internal: 172.16.31.3:3306 
+
+      become: true
+      register: testout
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: add 172.16.31.4:3306 to the same group
+      subutai_map:
+        protocol: tcp
+        internal: 172.16.31.4:3306
+        external: 46558
+
+      become: true
+      register: testout
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: remove container 172.16.31.3 from mapping
+      subutai_map:
+        protocol: tcp
+        internal: 172.16.31.3:3306
+        external: 46558
+        remove: 
+
+      become: true
+      register: testout
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: map 172.16.25.12:80 to RH's 8080 with domain name example.com
+      subutai_map:
+        protocol: http
+        internal: 172.16.25.12:80
+        external: 8080
+        domain: example.com
+
+      become: true
+      register: testout
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: add container to existing example.com domain
+      subutai_map:
+        protocol: http
+        internal: 172.16.25.13:80
+        external: 8080
+        domain: example.com
+
+      become: true
+      register: testout
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+    - name: create p2p instance 
+      subutai_p2p:
+        command: create
+        interface: p2p-net1
+        hash: swarm-12345678-abcd-1234-efgh-123456789012
+        key: 0123456789qwertyu0123456789zxcvbn
+        ttl: 1476870551
+        localPeepIPAddr: 10.220.22.1
+        portrange: 0-65535
+
+      become: true
+      register: testout
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: update p2p instance 
+      subutai_p2p:
+        command: update
+        interface: p2p-net1
+        hash: swarm-12345678-abcd-1234-efgh-123456789012
+        key: 0123456789qwertyu0123456789zxcvbn
+        ttl: 1476870551
+
+      become: true
+      register: testout
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: delete p2p instance 
+      subutai_p2p:
+        command: delete
+        hash: swarm-12345678-abcd-1234-efgh-123456789012
+
+      become: true
+      register: testout
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: add domain example.com to 100 vlan
+      subutai_proxy:
+        command: add
+        vlan: 100
+        domain: example.com
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: add domain example.com to 100 vlan
+      subutai_proxy:
+        command: add
+        vlan: 100
+        host: 10.10.0.20
+      become: true
+      register: testout
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: delete domain example.com
+      subutai_proxy:
+        command: delete
+        vlan: 100
+        domain: example.com
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: delete host 10.10.0.20
+      subutai_proxy:
+        command: delete
+        vlan: 100
+        host: 10.10.0.20
+      become: true
+      register: testout
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: subutai tunnel add 10.10.0.20
+      subutai_tunnel:
+        command: add
+        ipaddr: 10.10.0.20
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: subutai tunnel add 10.10.0.30:8080 300 -g
+      subutai_tunnel:
+        command: add
+        ipaddr: 10.10.0.30:8080
+        ttl: 300
+        globalFlag: true
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: subutai tunnel del 10.10.0.30:8080
+      subutai_tunnel:
+        command: delete
+        ipaddr: 10.10.0.30:8080
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+
+
+    - name: subutai tunnel del 10.10.0.20:8080
+      subutai_tunnel:
+        command: delete
+        ipaddr: 10.10.0.20:22
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: adding subutai vxlan tunnel
+      subutai_vxlan:
+        command: create
+        name: vxlan1
+        remoteip: 10.220.22.2
+        vlan: 100
+        vni: 12345
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: adding subutai vxlan tunnel
+      subutai_vxlan:
+        command: delete
+        name: vxlan1
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
