@@ -158,7 +158,7 @@
           container: management
       become: true
 
-    - name: export debian temaplate
+    - name: export debian template
       subutai_export:
         container: debian
       become: true
@@ -181,7 +181,7 @@
         newname: debian-test 
       become: true
 
-    - name: restore debian backup tp container
+    - name: restore debian backup to container
       subutai_restore:
         backupname: debian
         container: new_debian
@@ -411,13 +411,46 @@
       debug:
         msg: '{{ testout }}'
 
-    - name: adding subutai vxlan tunnel
+    - name: delete subutai vxlan tunnel
       subutai_vxlan:
         command: delete
         name: vxlan1
       become: true
       register: testout
 
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: install pip
+      apt:
+        name: python-requests
+      become: true
+    
+    - name: register rh instance 
+      subutai_registerrh:
+        command: approve
+        id: 9DBBA0ADFF947AF883ECBD93149F221EEE54C7YD
+        console: https://192.168.0.100:9999
+        username: admin
+        password: secret
+
+      become: true
+      register: testout
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: deregister rh instance 
+      subutai_registerrh:
+        command: remove
+        id: 9DBBA0ADFF947AF883ECBD93149F221EEE54C7YD
+        console: https://192.168.0.100:9999
+        username: admin
+        password: secret
+
+      become: true
+      register: testout
     - name: dump test output
       debug:
         msg: '{{ testout }}'
