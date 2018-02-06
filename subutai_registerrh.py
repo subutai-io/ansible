@@ -99,7 +99,7 @@ def run_module():
         id=dict(type='str', required=True),
         console=dict(type='str', required=True),
         username=dict(type='str', required=True),
-        password=dict(type='str', required=True),
+        password=dict(type='str', required=True, no_log=True),
     )
 
     # skell to result
@@ -110,7 +110,6 @@ def run_module():
         id='',
         console='',
         username='',
-        password='',
     )
 
     module = AnsibleModule(
