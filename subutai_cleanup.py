@@ -60,7 +60,9 @@ def run_module():
         return result
 
     # verify if container is already started
-    out = subprocess.Popen(["/snap/bin/subutai","cleanup"], stdout=subprocess.PIPE).stdout.read()
+    err = subprocess.Popen(["/snap/bin/subutai","cleanup"], stderr=subprocess.PIPE).stderr.read()
+    if err:
+        module.fail_json(msg='[Err] ' + err , **result)
     result['changed'] = True
 
     module.exit_json(**result)
