@@ -28,10 +28,7 @@ options:
         required: false
     external:
         description:
-            - optional parameter which shows desired RH socket where internal socket should 
-            be mapped. If more than one container mapped to one RH port, those containers 
-            are being put to the same backend group. Allowed port value must be in range of 
-            1000-65535
+            - optional parameter which shows desired RH socket where internal socket should be mapped. If more than one container mapped to one RH port, those containers are being put to the same backend group. Allowed port value must be in range of 1000-65535
         required: false
     domain:
         description:
@@ -54,7 +51,7 @@ options:
             - optional flags shows that specified mapping should be removed. If not set, "add" operation is assumed
         required: false
 
-extends_documentation_fragment
+extends_documentation_fragment:
     - subutai
 
 author:

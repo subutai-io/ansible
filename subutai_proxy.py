@@ -43,7 +43,7 @@ options:
             - pem certificate file
         required: false
 
-extends_documentation_fragment
+extends_documentation_fragment:
     - subutai
 
 author:

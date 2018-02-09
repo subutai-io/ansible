@@ -27,7 +27,7 @@ options:
             - check for updates without installation
         required: false
 
-extends_documentation_fragment
+extends_documentation_fragment:
     - subutai
 
 author:

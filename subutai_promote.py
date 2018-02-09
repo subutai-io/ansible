@@ -27,7 +27,7 @@ options:
             -  set the source for promoting
         required: false
 
-extends_documentation_fragment
+extends_documentation_fragment:
     - subutai
 
 author:

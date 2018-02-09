@@ -23,7 +23,7 @@ options:
             - name of container
         required: true
 
-extends_documentation_fragment
+extends_documentation_fragment:
     - subutai
 
 author:
