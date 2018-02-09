@@ -14,3 +14,6 @@ You'll need create a `hosts` file describing which servers this script will run,
 
 `localhost:2222`
 
+To generate Markdown documentation run:
+
+`./docgen.py`
