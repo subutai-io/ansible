@@ -90,8 +90,6 @@ def run_module():
         env='', 
         child='',
         ipaddr='', 
-        token='',
-        kurjun_token='',
     )
 
     module = AnsibleModule(
