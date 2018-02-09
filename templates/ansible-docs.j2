@@ -1,0 +1,44 @@
+---
+{% if modules['requirements'] %}
+### Requirements
+{% for req in modules['requirements'] %}
+* {{ req }}
+{% endfor %}
+{% endif %}
+
+## {{ modules['module'] }}
+{{ modules['short_description'] }}
+
+  * Synopsis
+  * Options
+  * Examples
+
+#### Synopsis
+{% for each in modules['description'] %} {{ each }}
+{% endfor %}
+
+#### Options
+
+| Parameter     | required    | default  | choices    | comments |
+| ------------- |-------------| ---------|----------- |--------- |
+{% for k,v in modules.items() -%}
+{% if k == 'options' -%}
+{% for option,values in v.items() -%}
+{% if option != "" %}| {{ option }}  |  {% if values.get('required') != None %} {{ values['required'] | replace('True','yes') | replace('False','no') }} {% endif %} | {% if values.get('default') != None %} {{ values['default'] | replace('None','')}} {% endif %} |{% if values.get('choices') != None %} <ul>{% for each in values['choices'] %} <li>{{ each }}</li> {% endfor %}</ul>{% endif %} | {% if values.get('description') != None %}{% for each in values['description'] %} {{ each }} {% endfor %}{% endif %} |
+{% endif %}
+{%- endfor %}
+{%- endif %}
+{%- endfor %}
+
+{% if modules['examples'] is defined %}
+
+#### Examples
+
+```
+{{ modules['examples'] | replace('{#','{{') | replace('#}','}}') }}
+```
+{% endif %}
+
+---
+Created by OptDyn, LLC
+
