@@ -27,7 +27,7 @@ options:
             - template version
         required: true
 
-extends_documentation_fragment
+extends_documentation_fragment:
     - subutai
 
 author:

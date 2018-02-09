@@ -16,7 +16,8 @@ version_added: "2.5"
 
 description:
     - "Peers with management installed can have Resource Hosts (RH) join the peer by being register."
-
+requirements:
+    - requests
 options:
     command:
         description:
@@ -39,7 +40,7 @@ options:
             - Console password
         required: false
 
-extends_documentation_fragment
+extends_documentation_fragment:
     - subutai
 
 author:

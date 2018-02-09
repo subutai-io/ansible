@@ -31,7 +31,7 @@ options:
             - date of backup to be restored
         required: false
 
-extends_documentation_fragment
+extends_documentation_fragment:
     - subutai
 
 author:

@@ -17,7 +17,7 @@ version_added: "2.5"
 description:
     - "Cleanup subutai enviroment"
 
-extends_documentation_fragment
+extends_documentation_fragment:
     - subutai
 
 author:

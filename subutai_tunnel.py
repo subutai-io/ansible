@@ -35,7 +35,7 @@ options:
             - There are two types of channels - local (default), which is created from destination address to host and global from destination to Subutai Helper node.
         required: false
 
-extends_documentation_fragment
+extends_documentation_fragment:
     - subutai
 
 author:
