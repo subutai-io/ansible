@@ -130,8 +130,6 @@ def run_module():
         changed=False,
         command='',
         interface='',
-        hash='',
-        key='',
         ttl='',
         localPeepIPAddr='',
         portrange='',

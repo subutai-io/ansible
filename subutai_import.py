@@ -78,7 +78,6 @@ def run_module():
         container='',
         torrent='',
         version='',
-        token='',
         message=''
     )
 

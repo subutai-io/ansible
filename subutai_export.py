@@ -89,7 +89,6 @@ def run_module():
         container='',
         version='',
         size='',
-        token='',
         description='',
         private='',
         message=''
