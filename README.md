@@ -1,7 +1,6 @@
 Plugins and Drivers for Subutai Integration
 ===========================================
 
-
 How to run
 -----------
 
