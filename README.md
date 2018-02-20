@@ -1,9 +1,8 @@
-# ansible
 Plugins and Drivers for Subutai Integration
 ===========================================
 
 
-How to run: 
+How to run
 -----------
 
 Inside this module directory, run: 
