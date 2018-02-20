@@ -4,9 +4,14 @@
   hosts: localhost
   port: 2222
   remote_user: subutai
-
+  gather_facts: False
 
   tasks:
+
+    - name: install python 2
+      raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+      become: true
+
     - name: run subutai import nginx
       subutai_import:
         container: 'nginx'
@@ -27,6 +32,16 @@
       debug:
         msg: '{{ testout }}'
 
+    - name: run subutai import management
+      subutai_import:
+        container: 'management'
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
     - name: run subutai stop management
       subutai_stop:
         container: 'management'
@@ -37,6 +52,15 @@
       debug:
         msg: '{{ testout }}'
 
+    - name: run subutai demote management
+      subutai_demote:
+        container: 'management'
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
 
     - name: run subutai start management
       subutai_start:
@@ -158,6 +182,11 @@
           container: management
       become: true
 
+    - name: import debian template
+      subutai_import:
+        container: debian
+      become: true
+
     - name: export debian template
       subutai_export:
         container: debian
@@ -175,16 +204,21 @@
         newname: debian
       become: true
 
+    - name: demote debian template
+      subutai_demote:
+        container: debian
+      become: true
+
     - name: hostname debian template
       subutai_hostname:
         container: debian
         newname: debian-test 
       become: true
 
-    - name: restore debian backup to container
+    - name: restore management backup to container
       subutai_restore:
-        backupname: debian
-        container: new_debian
+        backupname: management
+        container: new_management
       become: true
       register: testout
 
