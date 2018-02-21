@@ -153,15 +153,28 @@ def run_module():
     # disble annoying SSL warnings
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     s = requests.Session()
-    s.post('{}/login'.format(module.params['console']), data={'username': module.params['username'], 'password': module.params['password']}, verify=False)
+    s.post('{}/login'.format(module.params['console']), data={'username': module.params['console_username'], 'password': module.params['console_password']}, verify=False)
     
     if module.params['command'] == "register":
-        s.post('{}/rest/v1/hub/register'.format(module.params['console']), data={'email': module.params['email'], 'peerName': module.params['peer_name'] , 'password': module.params['hub_password'] ,'peerScope': module.params['peer_scope'] }, verify=False)
+        result['message'] = s.post('{}/rest/v1/hub/register'.format(module.params['console']), data={'email': module.params['email'], 'peerName': module.params['peer_name'] , 'password': module.params['hub_password'] ,'peerScope': module.params['peer_scope'] }, verify=False).reason
+        if result['message'] == "OK":
+            result['changed'] = True
+            module.exit_json(**result)     
+        else:
+            result['changed'] = False
+            module.fail_json(msg='[Err] {}'.format(result['message']), **result)
+        
         result['changed'] = True
         module.exit_json(**result)
     elif module.params['command'] == "unregister":
-        s.post('{}/rest/v1/hub/unregister'.format(module.params['console']), verify=False)
-        result['changed'] = True
+        result['message'] = s.delete('{}/rest/v1/hub/unregister'.format(module.params['console']), verify=False).reason
+        if result['message'] == "OK":
+            result['changed'] = True
+            module.exit_json(**result)
+        else:
+            result['changed'] = False
+            module.fail_json(msg='[Err] {}'.format(result['message']), **result)
+
         module.exit_json(**result)
     else:
         module.fail_json(msg='[Err] The options are register or unregister', **result)
