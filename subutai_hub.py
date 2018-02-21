@@ -8,7 +8,7 @@ ANSIBLE_METADATA = {
 
 DOCUMENTATION = '''
 ---
-module: subutai_registerhub
+module: subutai_hub
 
 short_description: subutai register Peer to Hub module
 
@@ -38,19 +38,19 @@ options:
     email:
         description:
             - Email registered on Hub
-        required: true
+        required: false
     peer_name:
         description:
             - Name of Peer on hub
-        required: true
+        required: false
     peer_scope:
         description:
             - options are Public, Private
-        required: true
+        required: false
     hub_password:
         description:
             - Hub password
-        required: true
+        required: false
 
 extends_documentation_fragment:
     - subutai
@@ -62,7 +62,7 @@ author:
 EXAMPLES = '''
 # register peer module
     - name: register peer instance 
-      subutai_registerhub:
+      subutai_hub:
         command: register
         console: https://192.168.0.100:9999
         console_username: admin
@@ -79,15 +79,11 @@ EXAMPLES = '''
         msg: '{{ testout }}'
 
     - name: unregister peer instance 
-      subutai_registerhub:
+      subutai_hub:
         command: unregister
         console: https://192.168.0.100:9999
         console_username: admin
         console_password: secret
-        email: example@example.com
-        peer_name: peertest
-        peer_scope: Public
-        hub_password: ************
 
       become: true
       register: testout
@@ -118,10 +114,10 @@ def run_module():
         console=dict(type='str', required=True),
         console_username=dict(type='str', required=True),
         console_password=dict(type='str', required=True, no_log=True),
-        email=dict(type='str', required=True),
-        peer_name=dict(type='str', required=True),
-        peer_scope=dict(type='str', required=True),
-        hub_password=dict(type='str', required=True, no_log=True),
+        email=dict(type='str', required=False),
+        peer_name=dict(type='str', required=False),
+        peer_scope=dict(type='str', required=False),
+        hub_password=dict(type='str', required=False, no_log=True),
     )
 
     # skell to result
