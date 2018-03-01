@@ -6,7 +6,9 @@ import os
 import yaml
 from jinja2 import Template
 
+
 class Module():
+
     def __init__(self):
         pass
 
@@ -28,14 +30,14 @@ class Module():
         >>> DOCUMENTATION = '''
         ...             ---
         ...             module: subutai_vxlan
-        ... 
+        ...
         ...             short_description: subutai vxlan module
-        ... 
+        ...
         ...             version_added: "2.5"
-        ... 
+        ...
         ...             description:
         ...                 - "configure vxlan tunnels"
-        ... 
+        ...
         ...             options:
         ...                 command:
         ...                     description:
@@ -69,5 +71,5 @@ class Module():
 if __name__ == '__main__':
     m = Module()
     for mod in glob.glob("subutai_*py"):
-        m.gen_markdown(mod.replace(".py",""))
+        m.gen_markdown(mod.replace(".py", ""))
         print("{}...".format(mod))
