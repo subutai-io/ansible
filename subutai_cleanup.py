@@ -42,6 +42,7 @@ message:
 import subprocess
 from ansible.module_utils.basic import AnsibleModule
 
+
 def run_module():
 
     # skell to result
@@ -60,12 +61,14 @@ def run_module():
         return result
 
     # verify if container is already started
-    err = subprocess.Popen(["/snap/bin/subutai","cleanup"], stderr=subprocess.PIPE).stderr.read()
+    err = subprocess.Popen(
+        ["/snap/bin/subutai", "cleanup"], stderr=subprocess.PIPE).stderr.read()
     if err:
-        module.fail_json(msg='[Err] ' + err , **result)
+        module.fail_json(msg='[Err] ' + err, **result)
     result['changed'] = True
 
     module.exit_json(**result)
+
 
 def main():
     run_module()

@@ -43,7 +43,7 @@ EXAMPLES = '''
 - name: backup nginx container
   subutai_backup:
     container: nginx
-    full_backup: true 
+    full_backup: true
     stop_container: true
 
 '''
@@ -59,6 +59,7 @@ message:
 import subprocess
 from ansible.module_utils.basic import AnsibleModule
 
+
 def run_module():
 
     # parameters
@@ -66,7 +67,7 @@ def run_module():
         container=dict(type='str', required=True),
         full_backup=dict(type='bool', required=False),
         stop_container=dict(type='bool', required=False),
-        
+
     )
 
     # skell to result
@@ -74,7 +75,7 @@ def run_module():
         changed=False,
         container='',
         full_backup='',
-        stop_container='', 
+        stop_container='',
         message=''
     )
 
@@ -88,23 +89,25 @@ def run_module():
         return result
 
     result['container'] = module.params['container']
-    result['full_backup'] =  module.params['full_backup']
+    result['full_backup'] = module.params['full_backup']
     result['stop_container'] = module.params['stop_container']
 
-    args=[]
+    args = []
     if module.params['full_backup']:
         args.append("-f")
-    
+
     if module.params['stop_container']:
         args.append("-s")
 
-    err = subprocess.Popen(["/snap/bin/subutai","backup", module.params['container']] + args, stderr=subprocess.PIPE).stderr.read()
+    err = subprocess.Popen(
+        ["/snap/bin/subutai", "backup", module.params['container']] + args, stderr=subprocess.PIPE).stderr.read()
     if err:
-        module.fail_json(msg='[Err] ' + err , **result)
+        module.fail_json(msg='[Err] ' + err, **result)
 
     result['changed'] = True
-      
+
     module.exit_json(**result)
+
 
 def main():
     run_module()

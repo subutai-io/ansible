@@ -61,6 +61,7 @@ message:
 import subprocess
 from ansible.module_utils.basic import AnsibleModule
 
+
 def run_module():
 
     # parameters
@@ -94,8 +95,8 @@ def run_module():
     result['torrent'] = module.params['torrent']
     result['version'] = module.params['version']
     result['token'] = module.params['token']
-    
-    args=[]
+
+    args = []
 
     if module.params['torrent']:
         args.append("--torrent")
@@ -109,24 +110,28 @@ def run_module():
         args.append(module.params['token'])
 
     # verify if container is already installed
-    out = subprocess.Popen(["/snap/bin/subutai","list"], stdout=subprocess.PIPE).stdout.read()
+    out = subprocess.Popen(
+        ["/snap/bin/subutai", "list"], stdout=subprocess.PIPE).stdout.read()
     if bytes(module.params['container']) in out:
         result['changed'] = False
         result['message'] = 'already installed'
-        
-    else: 
+
+    else:
         # try install container
-        err_msg = subprocess.Popen(["/snap/bin/subutai","import", module.params['container']] + args, stderr=subprocess.PIPE).stderr.read()
+        err_msg = subprocess.Popen(
+            ["/snap/bin/subutai", "import", module.params['container']] + args, stderr=subprocess.PIPE).stderr.read()
         if err_msg:
             result['message'] = '[Err] ' + err_msg
             result['changed'] = False
             module.fail_json(msg='[Err] ' + err_msg, **result)
 
-        out = subprocess.Popen(["/snap/bin/subutai","list"], stdout=subprocess.PIPE).stdout.read()
+        out = subprocess.Popen(
+            ["/snap/bin/subutai", "list"], stdout=subprocess.PIPE).stdout.read()
         if bytes(module.params['container']) in out:
             result['changed'] = True
 
     module.exit_json(**result)
+
 
 def main():
     run_module()

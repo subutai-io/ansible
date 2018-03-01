@@ -47,7 +47,7 @@ EXAMPLES = '''
 - name: set quota nginx container
   subutai_quota:
     container: nginx
-    resource: cpu 
+    resource: cpu
     set: 80
     threshold: 70
 
@@ -63,6 +63,7 @@ message:
 
 import subprocess
 from ansible.module_utils.basic import AnsibleModule
+
 
 def run_module():
 
@@ -94,16 +95,19 @@ def run_module():
         return result
 
     result['container'] = module.params['container']
-    result['resource'] =  module.params['resource']
+    result['resource'] = module.params['resource']
     result['set'] = module.params['set']
     result['threshold'] = module.params['threshold']
 
-    out = subprocess.Popen(["/snap/bin/subutai","quota",module.params['container'], module.params['resource'], "--set",module.params['set'], "--threshold",  module.params['threshold']], stdout=subprocess.PIPE).stdout.read()
+    out = subprocess.Popen(
+        ["/snap/bin/subutai", "quota", module.params['container'], module.params['resource'],
+         "--set", module.params['set'], "--threshold",  module.params['threshold']], stdout=subprocess.PIPE).stdout.read()
 
     result['message'] = out
     result['changed'] = True
-  
+
     module.exit_json(**result)
+
 
 def main():
     run_module()

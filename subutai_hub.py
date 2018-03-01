@@ -61,7 +61,7 @@ author:
 
 EXAMPLES = '''
 # register peer module
-    - name: register peer instance 
+    - name: register peer instance
       subutai_hub:
         command: register
         console: https://192.168.0.100:9999
@@ -78,7 +78,7 @@ EXAMPLES = '''
       debug:
         msg: '{{ testout }}'
 
-    - name: unregister peer instance 
+    - name: unregister peer instance
       subutai_hub:
         command: unregister
         console: https://192.168.0.100:9999
@@ -105,6 +105,7 @@ import subprocess
 import requests
 import urllib3
 from ansible.module_utils.basic import AnsibleModule
+
 
 def run_module():
 
@@ -153,31 +154,38 @@ def run_module():
     # disble annoying SSL warnings
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     s = requests.Session()
-    s.post('{}/login'.format(module.params['console']), data={'username': module.params['console_username'], 'password': module.params['console_password']}, verify=False)
-    
+    s.post('{}/login'.format(module.params['console']), data={'username': module.params[
+           'console_username'], 'password': module.params['console_password']}, verify=False)
+
     if module.params['command'] == "register":
-        result['message'] = s.post('{}/rest/v1/hub/register'.format(module.params['console']), data={'email': module.params['email'], 'peerName': module.params['peer_name'] , 'password': module.params['hub_password'] ,'peerScope': module.params['peer_scope'] }, verify=False).reason
-        if result['message'] == "OK":
-            result['changed'] = True
-            module.exit_json(**result)     
-        else:
-            result['changed'] = False
-            module.fail_json(msg='[Err] {}'.format(result['message']), **result)
-        
-        result['changed'] = True
-        module.exit_json(**result)
-    elif module.params['command'] == "unregister":
-        result['message'] = s.delete('{}/rest/v1/hub/unregister'.format(module.params['console']), verify=False).reason
+        result['message'] = s.post('{}/rest/v1/hub/register'.format(module.params['console']), data={'email': module.params['email'], 'peerName': module.params[
+                                   'peer_name'], 'password': module.params['hub_password'], 'peerScope': module.params['peer_scope']}, verify=False).reason
         if result['message'] == "OK":
             result['changed'] = True
             module.exit_json(**result)
         else:
             result['changed'] = False
-            module.fail_json(msg='[Err] {}'.format(result['message']), **result)
+            module.fail_json(
+                msg='[Err] {}'.format(result['message']), **result)
+
+        result['changed'] = True
+        module.exit_json(**result)
+    elif module.params['command'] == "unregister":
+        result['message'] = s.delete(
+            '{}/rest/v1/hub/unregister'.format(module.params['console']), verify=False).reason
+        if result['message'] == "OK":
+            result['changed'] = True
+            module.exit_json(**result)
+        else:
+            result['changed'] = False
+            module.fail_json(
+                msg='[Err] {}'.format(result['message']), **result)
 
         module.exit_json(**result)
     else:
-        module.fail_json(msg='[Err] The options are register or unregister', **result)
+        module.fail_json(
+            msg='[Err] The options are register or unregister', **result)
+
 
 def main():
     run_module()

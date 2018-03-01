@@ -53,13 +53,14 @@ message:
 import subprocess
 from ansible.module_utils.basic import AnsibleModule
 
+
 def run_module():
 
     # parameters
     module_args = dict(
         container=dict(type='str', required=True),
         check=dict(type='bool', required=False),
-              
+
     )
 
     # skell to result
@@ -80,17 +81,19 @@ def run_module():
         return result
 
     result['container'] = module.params['container']
-    result['check'] =  module.params['check']
+    result['check'] = module.params['check']
 
-    args= ""
+    args = ""
     if module.params['check']:
         args += " -c"
-    
-    out = subprocess.Popen(["/snap/bin/subutai","update", module.params['container'], args ], stdout=subprocess.PIPE).stdout.read()
-    
+
+    out = subprocess.Popen(
+        ["/snap/bin/subutai", "update", module.params['container'], args], stdout=subprocess.PIPE).stdout.read()
+
     result['changed'] = True
 
     module.exit_json(**result)
+
 
 def main():
     run_module()

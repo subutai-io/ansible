@@ -23,7 +23,7 @@ options:
             - name of container
         required: true
     restore:
-        description: 
+        description:
             - Restore checkpoint
         required: false
     stop_container:
@@ -43,7 +43,7 @@ EXAMPLES = '''
 - name: checkpoint nginx container
   subutai_checkpoint:
     container: nginx
-    restore: false 
+    restore: false
     stop_container: true
 
 '''
@@ -59,6 +59,7 @@ message:
 import subprocess
 from ansible.module_utils.basic import AnsibleModule
 
+
 def run_module():
 
     # parameters
@@ -66,7 +67,7 @@ def run_module():
         container=dict(type='str', required=True),
         restore=dict(type='bool', required=False),
         stop_container=dict(type='bool', required=False),
-        
+
     )
 
     # skell to result
@@ -74,7 +75,7 @@ def run_module():
         changed=False,
         container='',
         restore='',
-        stop_container='', 
+        stop_container='',
         message=''
     )
 
@@ -88,24 +89,27 @@ def run_module():
         return result
 
     result['container'] = module.params['container']
-    result['restore'] =  module.params['restore']
+    result['restore'] = module.params['restore']
     result['stop_container'] = module.params['stop_container']
 
-    args=[]
+    args = []
     if module.params['restore']:
         args.append("-r")
-    
+
     if module.params['stop_container']:
         args.append("-s")
 
-    out = subprocess.Popen(["/snap/bin/subutai","checkpoint", module.params['container']] + args, stdout=subprocess.PIPE).stdout.read()
-    
+    out = subprocess.Popen(
+        ["/snap/bin/subutai", "checkpoint", module.params['container']] + args, stdout=subprocess.PIPE).stdout.read()
+
     if "Failed" in out:
         result['changed'] = False
-        result['message'] = "/snap/bin/subutai checkpoint " + module.params['container'] +  str(args)
+        result['message'] = "/snap/bin/subutai checkpoint " + \
+            module.params['container'] + str(args)
         module.fail_json(msg='[Err] ' + out, **result)
-        
+
     module.exit_json(**result)
+
 
 def main():
     run_module()

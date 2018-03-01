@@ -112,6 +112,7 @@ message:
 import subprocess
 from ansible.module_utils.basic import AnsibleModule
 
+
 def run_module():
 
     # parameters
@@ -147,15 +148,15 @@ def run_module():
         return result
 
     result['command'] = module.params['command']
-    result['vlan'] =  module.params['vlan']
+    result['vlan'] = module.params['vlan']
     result['domain'] = module.params['domain']
     result['host'] = module.params['host']
     result['policy'] = module.params['policy']
-    result['file'] =  module.params['file']
-    
-    args=[]
+    result['file'] = module.params['file']
+
+    args = []
     check_args = []
-    
+
     if module.params['domain']:
         args.append("--domain")
         args.append(module.params['domain'])
@@ -169,27 +170,30 @@ def run_module():
 
     if module.params['policy']:
         args.append("--policy")
-        args.append(module.params['policy']) 
+        args.append(module.params['policy'])
 
     if module.params['file']:
         args.append("--file")
-        args.append(module.params['file']) 
+        args.append(module.params['file'])
 
     if module.params['command'] == "add":
-        out = subprocess.Popen(["/snap/bin/subutai","proxy","check",module.params['vlan']] + check_args,stdout=subprocess.PIPE).stdout.read()
+        out = subprocess.Popen(
+            ["/snap/bin/subutai", "proxy", "check", module.params['vlan']] + check_args, stdout=subprocess.PIPE).stdout.read()
         if out:
             result['changed'] = False
             module.exit_json(**result)
         else:
-            err = subprocess.Popen(["/snap/bin/subutai","proxy","add", module.params['vlan']] + args, stderr=subprocess.PIPE).stderr.read()
+            err = subprocess.Popen(
+                ["/snap/bin/subutai", "proxy", "add", module.params['vlan']] + args, stderr=subprocess.PIPE).stderr.read()
             if err:
                 module.fail_json(msg='[Err] ' + err + str(args), **result)
             else:
                 result['changed'] = True
                 module.exit_json(**result)
-     
+
     elif module.params['command'] == "delete":
-        err = subprocess.Popen(["/snap/bin/subutai","proxy","del",module.params['vlan']] + check_args, stderr=subprocess.PIPE).stderr.read()
+        err = subprocess.Popen(
+            ["/snap/bin/subutai", "proxy", "del", module.params['vlan']] + check_args, stderr=subprocess.PIPE).stderr.read()
         if err:
             module.fail_json(msg='[Err] ' + err + str(args), **result)
         else:
@@ -198,6 +202,7 @@ def run_module():
             module.exit_json(**result)
     else:
         module.fail_json(msg='[Err] ' + str(args), **result)
+
 
 def main():
     run_module()

@@ -59,6 +59,7 @@ message:
 import subprocess
 from ansible.module_utils.basic import AnsibleModule
 
+
 def run_module():
 
     # parameters
@@ -74,7 +75,7 @@ def run_module():
         container='',
         stage='',
         destination='',
-     )
+    )
 
     module = AnsibleModule(
         argument_spec=module_args,
@@ -86,10 +87,10 @@ def run_module():
         return result
 
     result['container'] = module.params['container']
-    result['stage'] =  module.params['stage']
+    result['stage'] = module.params['stage']
     result['destination'] = module.params['destination']
 
-    args= ["/snap/bin/subutai","migrate"]
+    args = ["/snap/bin/subutai", "migrate"]
     args.append(module.params['container'])
     args.append("-s")
     args.append(module.params['stage'])
@@ -102,7 +103,8 @@ def run_module():
     else:
         result['changed'] = True
         module.exit_json(**result)
-        
+
+
 def main():
     run_module()
 

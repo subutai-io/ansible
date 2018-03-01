@@ -56,7 +56,7 @@ EXAMPLES = '''
   subutai_clone:
     parent: nginx
     child: nginx2
-    
+
 '''
 
 RETURN = '''
@@ -70,6 +70,7 @@ message:
 import subprocess
 from ansible.module_utils.basic import AnsibleModule
 
+
 def run_module():
 
     # parameters
@@ -80,16 +81,16 @@ def run_module():
         ipaddr=dict(type='str', required=False),
         token=dict(type='str', required=False),
         kurjun_token=dict(type='str', required=False),
-        
+
     )
 
     # skell to result
     result = dict(
         changed=False,
         parent='',
-        env='', 
+        env='',
         child='',
-        ipaddr='', 
+        ipaddr='',
     )
 
     module = AnsibleModule(
@@ -102,13 +103,13 @@ def run_module():
         return result
 
     result['parent'] = module.params['parent']
-    result['child'] =  module.params['child']
-    result['env'] =  module.params['env']
+    result['child'] = module.params['child']
+    result['env'] = module.params['env']
     result['ipaddr'] = module.params['ipaddr']
     result['token'] = module.params['token']
-    result['kurjun_token'] =  module.params['kurjun_token']
+    result['kurjun_token'] = module.params['kurjun_token']
 
-    args=[]
+    args = []
     if module.params['env']:
         args.append("--env")
         args.append(module.params['env'])
@@ -125,11 +126,13 @@ def run_module():
         args.append("--kurjun_token")
         args.append(module.params['kurjun_token'])
 
-    out = subprocess.Popen(["/snap/bin/subutai","clone", module.params['parent'], module.params['child']] + args, stdout=subprocess.PIPE).stdout.read()
-    
+    out = subprocess.Popen(["/snap/bin/subutai", "clone", module.params[
+                           'parent'], module.params['child']] + args, stdout=subprocess.PIPE).stdout.read()
+
     result['changed'] = True
 
     module.exit_json(**result)
+
 
 def main():
     run_module()

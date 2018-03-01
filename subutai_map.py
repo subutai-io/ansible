@@ -63,7 +63,7 @@ EXAMPLES = '''
   - name: map container's 172.16.31.3 port 3306 to the random port on RH
     subutai_map:
       protocol: tcp
-      internal: 172.16.31.3:3306 
+      internal: 172.16.31.3:3306
 
   - name: add 172.16.31.4:3306 to the same group
     subutai_map:
@@ -83,6 +83,7 @@ message:
 
 import subprocess
 from ansible.module_utils.basic import AnsibleModule
+
 
 def run_module():
 
@@ -121,22 +122,22 @@ def run_module():
         return result
 
     result['protocol'] = module.params['protocol']
-    result['internal'] =  module.params['internal']
+    result['internal'] = module.params['internal']
     result['external'] = module.params['external']
     result['domain'] = module.params['domain']
     result['cert'] = module.params['cert']
-    result['policy'] =  module.params['policy']
-    result['sslbackend'] =  module.params['sslbackend']
+    result['policy'] = module.params['policy']
+    result['sslbackend'] = module.params['sslbackend']
     result['remove'] = module.params['remove']
 
-    args= ["/snap/bin/subutai","map"]
+    args = ["/snap/bin/subutai", "map"]
     args.append(module.params['protocol'])
     if module.params['internal']:
         args.append("--internal")
         args.append(module.params['internal'])
 
     if module.params['external']:
-        args.append("--external") 
+        args.append("--external")
         args.append(module.params['external'])
 
     if module.params['domain']:
@@ -148,7 +149,7 @@ def run_module():
         args.append(module.params['cert'])
 
     if module.params['policy']:
-        args.append("--policy") 
+        args.append("--policy")
         args.append(module.params['policy'])
 
     if module.params['remove']:
@@ -156,7 +157,7 @@ def run_module():
         args.append(module.params['remove'])
 
     if module.params['sslbackend']:
-        args.append("--sslbackend") 
+        args.append("--sslbackend")
         args.append(module.params['sslbackend'])
 
     err = subprocess.Popen(args, stderr=subprocess.PIPE).stderr.read()
@@ -169,6 +170,7 @@ def run_module():
     else:
         result['changed'] = True
         module.exit_json(**result)
+
 
 def main():
     run_module()

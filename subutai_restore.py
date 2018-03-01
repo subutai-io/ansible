@@ -43,7 +43,7 @@ EXAMPLES = '''
 - name: restore debian backup tp container
   subutai_restore:
     backupname: debian
-    container: new_debian 
+    container: new_debian
 
 '''
 
@@ -57,6 +57,7 @@ message:
 
 import subprocess
 from ansible.module_utils.basic import AnsibleModule
+
 
 def run_module():
 
@@ -87,25 +88,29 @@ def run_module():
         return result
 
     result['container'] = module.params['container']
-    result['backupname'] =  module.params['backupname']
+    result['backupname'] = module.params['backupname']
     result['date'] = module.params['date']
 
-    args=[]
+    args = []
     if module.params['date']:
         args.append("-d")
         args.append(module.params['date'])
 
-    err = subprocess.Popen(["/snap/bin/subutai","restore", module.params['backupname'], "-c",  module.params['container']] + args , stderr=subprocess.PIPE).stderr.read()
+    err = subprocess.Popen(
+        ["/snap/bin/subutai", "restore", module.params['backupname'],
+         "-c",  module.params['container']] + args, stderr=subprocess.PIPE).stderr.read()
     if err:
         result['changed'] = False
         module.fail_json(msg='[Err] ' + err, **result)
 
     result['changed'] = True
-    result['message'] = err 
+    result['message'] = err
     module.exit_json(**result)
 
+
 def get_config(container):
-    return subprocess.Popen(["/snap/bin/subutai","config",container], stdout=subprocess.PIPE).stdout.read()
+    return subprocess.Popen(["/snap/bin/subutai", "config", container], stdout=subprocess.PIPE).stdout.read()
+
 
 def main():
     run_module()

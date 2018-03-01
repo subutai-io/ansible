@@ -102,6 +102,7 @@ message:
 import subprocess
 from ansible.module_utils.basic import AnsibleModule
 
+
 def run_module():
     # parameters
     module_args = dict(
@@ -133,13 +134,13 @@ def run_module():
         return result
 
     result['command'] = module.params['command']
-    result['ipaddr'] =  module.params['ipaddr']
+    result['ipaddr'] = module.params['ipaddr']
     result['ttl'] = module.params['ttl']
     result['globalFlag'] = module.params['globalFlag']
 
-    args=[]
+    args = []
     check_args = []
-    
+
     if module.params['ttl']:
         args.append(module.params['ttl'])
 
@@ -147,15 +148,17 @@ def run_module():
         args.append("-g")
 
     if module.params['command'] == "add":
-        err = subprocess.Popen(["/snap/bin/subutai","tunnel","add", module.params['ipaddr']] + args ,stderr=subprocess.PIPE).stderr.read()
+        err = subprocess.Popen(
+            ["/snap/bin/subutai", "tunnel", "add", module.params['ipaddr']] + args, stderr=subprocess.PIPE).stderr.read()
         if err:
             module.fail_json(msg='[Err] ' + err + str(args), **result)
         else:
             result['changed'] = True
             module.exit_json(**result)
-           
+
     elif module.params['command'] == "delete":
-        err = subprocess.Popen(["/snap/bin/subutai","tunnel","del", module.params['ipaddr']], stderr=subprocess.PIPE).stderr.read()
+        err = subprocess.Popen(
+            ["/snap/bin/subutai", "tunnel", "del", module.params['ipaddr']], stderr=subprocess.PIPE).stderr.read()
         if err:
             module.fail_json(msg='[Err] ' + err, **result)
         else:
@@ -163,6 +166,7 @@ def run_module():
             module.exit_json(**result)
     else:
         module.fail_json(msg='[Err] ' + str(args), **result)
+
 
 def main():
     run_module()

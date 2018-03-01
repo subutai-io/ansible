@@ -49,6 +49,7 @@ message:
 import subprocess
 from ansible.module_utils.basic import AnsibleModule
 
+
 def run_module():
 
     # parameters
@@ -73,26 +74,30 @@ def run_module():
         return result
 
     result['container'] = module.params['container']
-    
+
     # verify if container is already installed
-    out = subprocess.Popen(["/snap/bin/subutai","list"], stdout=subprocess.PIPE).stdout.read()
+    out = subprocess.Popen(
+        ["/snap/bin/subutai", "list"], stdout=subprocess.PIPE).stdout.read()
     if bytes(module.params['container']) not in out:
         result['changed'] = False
         result['message'] = 'not installed'
-        
-    else: 
+
+    else:
         # try destroy container
-        err_msg = subprocess.Popen(["/snap/bin/subutai","destroy", module.params['container']], stderr=subprocess.PIPE).stderr.read()
+        err_msg = subprocess.Popen(
+            ["/snap/bin/subutai", "destroy", module.params['container']], stderr=subprocess.PIPE).stderr.read()
         if err_msg:
             result['message'] = '[Err] ' + err_msg
             result['changed'] = False
             module.fail_json(msg='[Err] ' + err_msg, **result)
 
-        out = subprocess.Popen(["/snap/bin/subutai","list"], stdout=subprocess.PIPE).stdout.read()
+        out = subprocess.Popen(
+            ["/snap/bin/subutai", "list"], stdout=subprocess.PIPE).stdout.read()
         if bytes(module.params['container']) not in out:
             result['changed'] = True
 
     module.exit_json(**result)
+
 
 def main():
     run_module()

@@ -57,7 +57,7 @@ author:
 
 EXAMPLES = '''
 # p2p module
-    - name: create p2p instance 
+    - name: create p2p instance
       subutai_p2p:
         command: create
         interface: p2p-net1
@@ -73,7 +73,7 @@ EXAMPLES = '''
       debug:
         msg: '{{ testout }}'
 
-    - name: update p2p instance 
+    - name: update p2p instance
       subutai_p2p:
         command: update
         interface: p2p-net1
@@ -87,7 +87,7 @@ EXAMPLES = '''
       debug:
         msg: '{{ testout }}'
 
-    - name: delete p2p instance 
+    - name: delete p2p instance
       subutai_p2p:
         command: delete
         hash: swarm-12345678-abcd-1234-efgh-123456789012
@@ -110,6 +110,7 @@ message:
 
 import subprocess
 from ansible.module_utils.basic import AnsibleModule
+
 
 def run_module():
 
@@ -146,14 +147,14 @@ def run_module():
         return result
 
     result['command'] = module.params['command']
-    result['interface'] =  module.params['interface']
+    result['interface'] = module.params['interface']
     result['hash'] = module.params['hash']
     result['key'] = module.params['key']
     result['ttl'] = module.params['ttl']
-    result['localPeepIPAddr'] =  module.params['localPeepIPAddr']
-    result['portrange'] =  module.params['portrange']
+    result['localPeepIPAddr'] = module.params['localPeepIPAddr']
+    result['portrange'] = module.params['portrange']
 
-    args= ["/snap/bin/subutai","p2p"]
+    args = ["/snap/bin/subutai", "p2p"]
 
     if module.params['command'] == "create":
         args.append("-c")
@@ -165,11 +166,11 @@ def run_module():
         module.fail_json(msg='[Err] ' + str(args), **result)
 
     if module.params['interface']:
-        args.append(module.params['interface']) 
+        args.append(module.params['interface'])
 
     if module.params['hash']:
         args.append(module.params['hash'])
-  
+
     if module.params['key']:
         args.append(module.params['key'])
 
@@ -188,6 +189,7 @@ def run_module():
     else:
         result['changed'] = True
         module.exit_json(**result)
+
 
 def main():
     run_module()

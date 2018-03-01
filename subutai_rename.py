@@ -39,7 +39,7 @@ EXAMPLES = '''
 - name: rename debian container
   subutai_rename:
     container: debian
-    newname: debian-test 
+    newname: debian-test
 
 '''
 
@@ -53,6 +53,7 @@ message:
 
 import subprocess
 from ansible.module_utils.basic import AnsibleModule
+
 
 def run_module():
 
@@ -80,16 +81,18 @@ def run_module():
         return result
 
     result['container'] = module.params['container']
-    result['newname'] =  module.params['newname']
+    result['newname'] = module.params['newname']
 
-    err = subprocess.Popen(["/snap/bin/subutai","rename", module.params['container'], module.params['newname'] ], stderr=subprocess.PIPE).stderr.read()
+    err = subprocess.Popen(["/snap/bin/subutai", "rename", module.params[
+                           'container'], module.params['newname']], stderr=subprocess.PIPE).stderr.read()
     if err:
         result['changed'] = False
         module.fail_json(msg='[Err] ' + err, **result)
 
     result['changed'] = True
-        
+
     module.exit_json(**result)
+
 
 def main():
     run_module()

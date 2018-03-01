@@ -49,7 +49,7 @@ author:
 
 EXAMPLES = '''
 # register rh module
-    - name: register rh instance 
+    - name: register rh instance
       subutai_registerrh:
         command: approve
         id: 9DBBA0ADFF947AF883ECBD93149F221EEE54C7YD
@@ -63,7 +63,7 @@ EXAMPLES = '''
       debug:
         msg: '{{ testout }}'
 
-    - name: register rh instance 
+    - name: register rh instance
       subutai_registerrh:
         command: remove
         id: 9DBBA0ADFF947AF883ECBD93149F221EEE54C7YD
@@ -91,6 +91,7 @@ import subprocess
 import requests
 import urllib3
 from ansible.module_utils.basic import AnsibleModule
+
 
 def run_module():
 
@@ -123,7 +124,7 @@ def run_module():
         return result
 
     result['command'] = module.params['command']
-    result['id'] =  module.params['id']
+    result['id'] = module.params['id']
     result['console'] = module.params['console']
     result['username'] = module.params['username']
     result['password'] = module.params['password']
@@ -131,18 +132,23 @@ def run_module():
     # disble annoying SSL warnings
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     s = requests.Session()
-    s.post('{}/login'.format(module.params['console']), data={'username': module.params['username'], 'password': module.params['password']}, verify=False)
-    
+    s.post('{}/login'.format(module.params['console']), data={
+           'username': module.params['username'], 'password': module.params['password']}, verify=False)
+
     if module.params['command'] == "approve":
-        s.post('{}/rest/v1/registration/requests/{}/approve'.format(module.params['console'], module.params['id'] ), verify=False)
+        s.post('{}/rest/v1/registration/requests/{}/approve'.format(
+            module.params['console'], module.params['id']), verify=False)
         result['changed'] = True
         module.exit_json(**result)
     elif module.params['command'] == "remove":
-        s.post('{}/rest/v1/registration/requests/{}/remove'.format(module.params['console'], module.params['id'] ), verify=False)
+        s.post('{}/rest/v1/registration/requests/{}/remove'.format(
+            module.params['console'], module.params['id']), verify=False)
         result['changed'] = True
         module.exit_json(**result)
     else:
-        module.fail_json(msg='[Err] The options are approve or remove', **result)
+        module.fail_json(
+            msg='[Err] The options are approve or remove', **result)
+
 
 def main():
     run_module()
