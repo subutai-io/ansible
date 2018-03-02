@@ -1,0 +1,9 @@
+---
+- name: run all tests
+  hosts: localhost
+  port: 2222
+  remote_user: subutai
+  gather_facts: False
+
+- import_playbook: _backup.yml
+- import_playbook: _checkpoint.yml
