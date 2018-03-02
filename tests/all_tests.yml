@@ -7,3 +7,4 @@
 
 - import_playbook: _backup.yml
 - import_playbook: _checkpoint.yml
+- import_playbook: _cleanup.yml

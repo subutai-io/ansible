@@ -1,0 +1,15 @@
+---
+- name: test subutai checkpoint module
+  hosts: localhost
+  port: 2222
+  remote_user: subutai
+  gather_facts: False
+  tasks:
+    - name: cleanup enviroment
+      subutai_cleanup:
+        vlan: 101
+      become: true
+    - name: cleanup enviroment [2nd run]
+      subutai_cleanup:
+        vlan: 101
+      become: true
