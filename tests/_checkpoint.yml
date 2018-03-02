@@ -9,12 +9,22 @@
       subutai_checkpoint:
         container: 'management'
         stop_container: true
-    
+      become: true
+
+    - name: checkpoint container [2nd run]
+      subutai_checkpoint:
+        container: 'management'
+        stop_container: true
       become: true
 
     - name: restore checkpoint container
       subutai_checkpoint:
         container: 'management'
         restore: True
+      become: true
 
+    - name: restore checkpoint container [2nd run]
+      subutai_checkpoint:
+        container: 'management'
+        restore: True
       become: true
