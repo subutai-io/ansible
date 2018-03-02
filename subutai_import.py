@@ -22,10 +22,6 @@ options:
         description:
             - name of container
         required: true
-    torrent:
-        description:
-            - use BitTorrent for downloading (experimental)
-        required: false
     version:
         description:
             - template version
@@ -67,7 +63,6 @@ def run_module():
     # parameters
     module_args = dict(
         container=dict(type='str', required=True),
-        torrent=dict(type='bool', required=False),
         version=dict(type='str', required=False),
         token=dict(type='str', required=False),
 
@@ -77,7 +72,6 @@ def run_module():
     result = dict(
         changed=False,
         container='',
-        torrent='',
         version='',
         message=''
     )
@@ -92,15 +86,11 @@ def run_module():
         return result
 
     result['container'] = module.params['container']
-    result['torrent'] = module.params['torrent']
     result['version'] = module.params['version']
     result['token'] = module.params['token']
 
     args = []
-
-    if module.params['torrent']:
-        args.append("--torrent")
-
+    
     if module.params['version']:
         args.append("-v")
         args.append(module.params['version'])
