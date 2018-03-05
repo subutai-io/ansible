@@ -28,19 +28,19 @@ options:
         required: true
     env:
         description:
-            - env id
+            - set environment id for container
         required: false
     ipaddr:
         description:
-            - ip address
+            - set container IP address and VLAN
         required: false
     token:
         description:
-            - token
+            - token to verify with MH  
         required: false
     kurjun_token:
         description:
-            - kurjun token
+            - kurjun token to clone private and shared templates
         required: false
 
 extends_documentation_fragment:
@@ -126,12 +126,27 @@ def run_module():
         args.append("--kurjun_token")
         args.append(module.params['kurjun_token'])
 
+    if container_exists(module.params['child']):
+        result['changed'] = False
+        module.exit_json(**result)
+
     out = subprocess.Popen(["/snap/bin/subutai", "clone", module.params[
-                           'parent'], module.params['child']] + args, stdout=subprocess.PIPE).stdout.read()
+        'parent'], module.params['child']] + args, stderr=subprocess.PIPE).stderr.read()
 
-    result['changed'] = True
+    if out != "" or not container_exists(module.params['child']):
+        result['changed'] = False
+        result['message'] = out
+        module.fail_json(msg='[Err] ' + out, **result)
+    else:
+        result['changed'] = True
+        module.exit_json(**result)
 
-    module.exit_json(**result)
+def container_exists(container):
+    out = subprocess.Popen(["/snap/bin/subutai", "list"], stdout=subprocess.PIPE).stdout.read()
+    if container in out:
+        return True
+    else:
+        return False
 
 
 def main():
