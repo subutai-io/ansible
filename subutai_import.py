@@ -100,9 +100,7 @@ def run_module():
         args.append(module.params['token'])
 
     # verify if container is already installed
-    out = subprocess.Popen(
-        ["/snap/bin/subutai", "list"], stdout=subprocess.PIPE).stdout.read()
-    if bytes(module.params['container']) in out:
+    if is_installed(module.params['container']):
         result['changed'] = False
         result['message'] = 'already installed'
 
@@ -115,13 +113,18 @@ def run_module():
             result['changed'] = False
             module.fail_json(msg='[Err] ' + err_msg, **result)
 
-        out = subprocess.Popen(
-            ["/snap/bin/subutai", "list"], stdout=subprocess.PIPE).stdout.read()
-        if bytes(module.params['container']) in out:
+        if is_installed(module.params['container']):
             result['changed'] = True
 
     module.exit_json(**result)
 
+def is_installed(container):
+    out = subprocess.Popen(
+        ["/snap/bin/subutai", "list"], stdout=subprocess.PIPE).stdout.read()
+    if container+'\n' in out:
+        return True
+    else:
+        return False
 
 def main():
     run_module()
