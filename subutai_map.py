@@ -162,7 +162,7 @@ def run_module():
 
     err = subprocess.Popen(args, stderr=subprocess.PIPE).stderr.read()
     if err:
-        if "Map is already exists" in err:
+        if "already exists" in err:
             result['changed'] = False
             module.exit_json(**result)
         else:
