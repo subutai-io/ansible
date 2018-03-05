@@ -1,0 +1,59 @@
+---
+- name: change hostname in debian container
+  hosts: localhost
+  port: 2222
+  remote_user: subutai
+  gather_facts: False
+  
+  tasks:
+    - name: import debian container
+      subutai_import:
+        container: debian
+      become: true
+      register: testout
+          
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: demote debian container
+      subutai_demote:
+        container: debian
+      become: true
+      register: testout
+          
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: start debian container
+      subutai_start:
+        container: debian
+      become: true
+      register: testout
+          
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: change hostname in debian container
+      subutai_hostname:
+        container: debian
+        newname: debian-test
+      become: true
+      register: testout
+          
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: change hostname in debian container [2nd run]
+      subutai_hostname:
+        container: debian
+        newname: debian-test
+      become: true
+      register: testout
+          
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
