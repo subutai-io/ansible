@@ -1,5 +1,5 @@
 ---
-- name: run subutai destroy nginx
+- name: hub module
   hosts: localhost
   port: 2222
   remote_user: subutai
