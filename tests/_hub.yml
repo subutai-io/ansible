@@ -1,0 +1,37 @@
+---
+- name: run subutai destroy nginx
+  hosts: localhost
+  port: 2222
+  remote_user: subutai
+  gather_facts: False
+  
+  tasks:
+    - name: register peer instance
+      subutai_hub:
+        command: register
+        console: https://192.168.0.100:9999
+        console_username: admin
+        console_password: secret
+        email: example@example.com
+        peer_name: peertest
+        peer_scope: Public
+        hub_password: ************
+
+      become: true
+      register: testout
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: unregister peer instance
+      subutai_hub:
+        command: unregister
+        console: https://192.168.0.100:9999
+        console_username: admin
+        console_password: secret
+
+      become: true
+      register: testout
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
