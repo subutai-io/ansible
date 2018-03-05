@@ -76,11 +76,10 @@ def run_module():
     result['container'] = module.params['container']
 
     # verify if container is already installed
-    out = subprocess.Popen(
-        ["/snap/bin/subutai", "list"], stdout=subprocess.PIPE).stdout.read()
-    if bytes(module.params['container']) not in out:
+    if not is_installed(module.params['container']):
         result['changed'] = False
         result['message'] = 'not installed'
+        module.exit_json(**result)
 
     else:
         # try destroy container
@@ -90,14 +89,17 @@ def run_module():
             result['message'] = '[Err] ' + err_msg
             result['changed'] = False
             module.fail_json(msg='[Err] ' + err_msg, **result)
-
-        out = subprocess.Popen(
-            ["/snap/bin/subutai", "list"], stdout=subprocess.PIPE).stdout.read()
-        if bytes(module.params['container']) not in out:
+        else:
             result['changed'] = True
+            module.exit_json(**result)
 
-    module.exit_json(**result)
-
+def is_installed(container):
+    out = subprocess.Popen(
+        ["/snap/bin/subutai", "list"], stdout=subprocess.PIPE).stdout.read()
+    if container+'\n' in out:
+        return True
+    else:
+        return False
 
 def main():
     run_module()
