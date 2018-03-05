@@ -1,0 +1,22 @@
+---
+- name: demote nginx template
+  hosts: localhost
+  port: 2222
+  remote_user: subutai
+  gather_facts: False
+  
+  tasks:
+
+    - name: demote nginx template
+      subutai_demote:
+        container: nginx
+        ipaddr: 192.168.1.1/24
+        vlan: foo
+      become: true
+
+    - name: demote nginx template [2nd run]
+      subutai_demote:
+        container: nginx
+        ipaddr: 192.168.1.1/24
+        vlan: foo
+      become: true
