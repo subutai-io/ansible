@@ -15,12 +15,12 @@ short_description: subutai config module
 version_added: "2.5"
 
 description:
-    - "configure containers in subutai"
+    - Configure containers in subutai.
 
 options:
     container:
         description:
-            - name of container
+            - Name of container.
         required: true
     operation:
         description:
@@ -70,7 +70,7 @@ def run_module():
     # parameters
     module_args = dict(
         container=dict(type='str', required=True),
-        operation=dict(type='str', required=True),
+        operation=dict(type='str', required=True, choices=['add', 'del']),
         key=dict(type='str', required=True),
         value=dict(type='str', required=False),
     )

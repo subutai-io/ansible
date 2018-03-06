@@ -15,20 +15,20 @@ short_description: subutai demote module
 version_added: "2.5"
 
 description:
-    - "demotes templates to containers in subutai"
+    - Demotes templates to containers in subutai.
 
 options:
     container:
         description:
-            - name of container
+            - Name of container.
         required: true
     ipaddr:
         description:
-            - IPv4 address, ie 192.168.1.1/24
+            - IPv4 address, ie 192.168.1.1/24 
         required: false
     vlan:
         description:
-            - VLAN tag
+            - VLAN tag.
         required: false
 
 extends_documentation_fragment:
@@ -50,10 +50,10 @@ EXAMPLES = '''
 
 RETURN = '''
 container:
-    description: Container affected
+    description: Container affected.
     type: str
 message:
-    description: The output message that the sample module generates
+    description: The output message that the sample module generates.
 '''
 
 import subprocess

@@ -15,20 +15,20 @@ short_description: subutai backup module
 version_added: "2.5"
 
 description:
-    - "backup containers in subutai"
+    - Backup containers in subutai.
 
 options:
     container:
         description:
-            - name of container
+            - The name of container.
         required: true
     full_backup:
         description:
-            - make a full backup
+            - Make a full backup.
         required: false
     stop_container:
         description:
-            - stop container before backup
+            - Stop container before backup.
         required: false
 
 extends_documentation_fragment:
@@ -50,10 +50,10 @@ EXAMPLES = '''
 
 RETURN = '''
 container:
-    description: Container affected
+    description: Container affected.
     type: str
 message:
-    description: The output message that the sample module generates
+    description: The output message that the sample module generates.
 '''
 
 import subprocess

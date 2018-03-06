@@ -10,12 +10,12 @@ DOCUMENTATION = '''
 ---
 module: subutai_vxlan
 
-short_description: subutai vxlan module
+short_description: Subutai vxlan module.
 
 version_added: "2.5"
 
 description:
-    - "configure vxlan tunnels"
+    - Configure vxlan tunnels.
 
 options:
     command:
@@ -24,19 +24,19 @@ options:
         required: true
     name:
         description:
-            - tunnel name
+            - Tunnel name.
         required: false
     remoteip:
         description:
-            - remote IP address
+            - Remote IP address.
         required: false
     vlan:
         description:
-            - vlan name
+            - Vlan name.
         required: false
     vni:
         description:
-            - VXLAN tunnel VNI
+            - VXLAN tunnel VNI.
         required: false
 
 extends_documentation_fragment:
@@ -77,10 +77,10 @@ EXAMPLES = '''
 
 RETURN = '''
 container:
-    description: Container affected
+    description: Container affected.
     type: str
 message:
-    description: The output message that the sample module generates
+    description: The output message that the sample module generates.
 '''
 
 import subprocess
@@ -90,7 +90,7 @@ from ansible.module_utils.basic import AnsibleModule
 def run_module():
     # parameters
     module_args = dict(
-        command=dict(type='str', required=True),
+        command=dict(type='str', required=True, choices=['create', 'delete']),
         name=dict(type='str', required=True),
         remoteip=dict(type='str', required=False),
         vlan=dict(type='str', required=False),
@@ -125,7 +125,6 @@ def run_module():
     result['vni'] = module.params['vni']
 
     args = []
-    check_args = []
 
     if module.params['remoteip']:
         args.append("--remoteip")

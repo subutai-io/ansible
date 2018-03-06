@@ -10,25 +10,25 @@ DOCUMENTATION = '''
 ---
 module: subutai_export
 
-short_description: subutai export module
+short_description: Subutai export module.
 
 version_added: "2.5"
 
 description:
-    - "export containers in subutai"
+    - Export containers in subutai.
 
 options:
     container:
         description:
-            - name of container
+            - Name of container.
         required: true
     version:
         description:
-            - template version
+            - Template version.
         required: false
     size:
         description:
-            - template preferred size -- tiny, small, medium, large, huge
+            - Template preferred size -- tiny, small, medium, large, huge.
         required: false
     token:
         description:
@@ -78,7 +78,7 @@ def run_module():
     module_args = dict(
         container=dict(type='str', required=True),
         version=dict(type='str', required=False),
-        size=dict(type='str', required=False),
+        size=dict(type='str', required=False, choices=['tiny', 'small', 'medium', 'large', 'huge']),
         token=dict(type='str', required=False),
         description=dict(type='str', required=False),
         private=dict(type='bool', required=False),

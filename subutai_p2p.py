@@ -8,14 +8,14 @@ ANSIBLE_METADATA = {
 
 DOCUMENTATION = '''
 ---
-module: subutai_p2p
+module: Subutai_p2p.
 
 short_description: subutai p2p module
 
 version_added: "2.5"
 
 description:
-    - "configure network p2p for containers in subutai"
+    - Configure network p2p for containers in subutai.
 
 options:
     command:
@@ -116,7 +116,7 @@ def run_module():
 
     # parameters
     module_args = dict(
-        command=dict(type='str', required=True),
+        command=dict(type='str', required=True, choices=),
         interface=dict(type='str', required=False),
         hash=dict(type='str', required=False),
         key=dict(type='str', required=False),

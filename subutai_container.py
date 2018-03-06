@@ -15,12 +15,12 @@ short_description: subutai container module
 version_added: "2.5"
 
 description:
-    - "This manage containers with subutai"
+    - This modules manage all life cicle of subutai containers.
 
 options:
     name:
         description:
-            - name of container
+            - Name of container.
         required: true
     state:
         description:
@@ -29,15 +29,15 @@ options:
         choices: [ absent, present, latest, started, stopped ]
     version:
         description:
-            - template version
+            - Template version.
         required: false
     token:
         description:
-            - token to access private repo
+            - Token to access private repo.
         required: false
     check:
         description:
-            - check for updates without installation
+            - Check for updates without installation.
         required: false
 
 extends_documentation_fragment:
@@ -71,10 +71,10 @@ EXAMPLES = '''
 
 RETURN = '''
 container:
-    description: Container affected
+    description: Container affected.
     type: str
 message:
-    description: The output message that the sample module generates
+    description: The output message that the sample module generates.
 '''
 
 import subprocess

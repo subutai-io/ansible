@@ -10,17 +10,17 @@ DOCUMENTATION = '''
 ---
 module: subutai_cleanup
 
-short_description: subutai cleanup module
+short_description: Subutai cleanup module.
 
 version_added: "2.5"
 
 description:
-    - "Cleanup subutai enviroment"
+    - Cleanup subutai enviroment.
 
 options:
     vlan:
         description:
-            - name of vlan
+            - Name of vlan.
         required: true
 
 extends_documentation_fragment:
@@ -40,10 +40,10 @@ EXAMPLES = '''
 
 RETURN = '''
 container:
-    description: Container affected
+    description: Container affected.
     type: str
 message:
-    description: The output message that the sample module generates
+    description: The output message that the sample module generates.
 '''
 
 import subprocess

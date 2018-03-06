@@ -10,21 +10,21 @@ DOCUMENTATION = '''
 ---
 module: subutai_promote
 
-short_description: subutai promote module
+short_description: Subutai promote module.
 
 version_added: "2.5"
 
 description:
-    - "promotes container to template in subutai"
+    - Promotes container to template in subutai.
 
 options:
     container:
         description:
-            - name of container
+            - Name of container.
         required: true
     source:
         description:
-            -  set the source for promoting
+            - Set the source for promoting.
         required: false
 
 extends_documentation_fragment:
@@ -44,10 +44,10 @@ EXAMPLES = '''
 
 RETURN = '''
 container:
-    description: Container affected
+    description: Container affected.
     type: str
 message:
-    description: The output message that the sample module generates
+    description: The output message that the sample module generates.
 '''
 
 import subprocess

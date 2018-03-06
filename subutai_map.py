@@ -10,45 +10,45 @@ DOCUMENTATION = '''
 ---
 module: subutai_map
 
-short_description: subutai map module
+short_description: Subutai map module.
 
 version_added: "2.5"
 
 description:
-    - "configure network map for containers in subutai"
+    - Configure network map for containers in subutai.
 
 options:
     protocol:
         description:
-            - specifies required protocol for mapping and might be http, https, tcp or udp.
+            - Specifies required protocol for mapping and might be http, https, tcp or udp.
         required: true
     internal:
         description:
-            - peer's internal socket that should be exposed. Format should be <ip>:<port>
+            - Peer's internal socket that should be exposed. Format should be <ip>:<port>
         required: false
     external:
         description:
-            - optional parameter which shows desired RH socket where internal socket should be mapped. If more than one container mapped to one RH port, those containers are being put to the same backend group. Allowed port value must be in range of 1000-65535
+            - Optional parameter which shows desired RH socket where internal socket should be mapped. If more than one container mapped to one RH port, those containers are being put to the same backend group. Allowed port value must be in range of 1000-65535
         required: false
     domain:
         description:
-            - should be only specified for http and https protocols mapping
+            - Should be only specified for http and https protocols mapping.
         required: false
     cert:
         description:
-            - path to SSL pem certificate for https protocol
+            - Path to SSL pem certificate for https protocol.
         required: false
     policy:
         description:
-            - balancing methods (round-robin by default, least_time, hash, ip_hash)
+            - Balancing methods (round-robin by default, least_time, hash, ip_hash).
         required: false
     sslbackend :
         description:
-            - ssl backend in https upstream
+            - SSL backend in https upstream.
         required: false
     remove:
         description:
-            - optional flags shows that specified mapping should be removed. If not set, "add" operation is assumed
+            - Optional flags shows that specified mapping should be removed. If not set, "add" operation is assumed.
         required: false
 
 extends_documentation_fragment:
@@ -75,10 +75,10 @@ EXAMPLES = '''
 
 RETURN = '''
 container:
-    description: Container affected
+    description: Container affected.
     type: str
 message:
-    description: The output message that the sample module generates
+    description: The output message that the sample module generates.
 '''
 
 import subprocess
@@ -89,7 +89,7 @@ def run_module():
 
     # parameters
     module_args = dict(
-        protocol=dict(type='str', required=True),
+        protocol=dict(type='str', required=True, choices=['http', 'https', 'tcp', 'udp']),
         internal=dict(type='str', required=False),
         external=dict(type='str', required=False),
         domain=dict(type='str', required=False),

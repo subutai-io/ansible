@@ -10,12 +10,12 @@ DOCUMENTATION = '''
 ---
 module: subutai_tunnel
 
-short_description: subutai tunnel module
+short_description: Subutai tunnel module.
 
 version_added: "2.5"
 
 description:
-    - "configure network tunnel for containers in subutai"
+    - Configure network tunnel for containers in subutai.
 
 options:
     command:
@@ -24,11 +24,11 @@ options:
         required: true
     ipaddr:
         description:
-            - IP address
+            - IP address.
         required: false
     ttl:
         description:
-            - Tunnels may also be set to be permanent (default) or temporary (ttl in seconds)
+            - Tunnels may also be set to be permanent (default) or temporary (ttl in seconds).
         required: false
     globalFlag:
         description:
@@ -93,10 +93,10 @@ EXAMPLES = '''
 
 RETURN = '''
 container:
-    description: Container affected
+    description: Container affected.
     type: str
 message:
-    description: The output message that the sample module generates
+    description: The output message that the sample module generates.
 '''
 
 import subprocess
@@ -106,7 +106,7 @@ from ansible.module_utils.basic import AnsibleModule
 def run_module():
     # parameters
     module_args = dict(
-        command=dict(type='str', required=True),
+        command=dict(type='str', required=True, choices=['add', 'delete']),
         ipaddr=dict(type='str', required=True),
         ttl=dict(type='str', required=False),
         globalFlag=dict(type='bool', required=False)
@@ -139,7 +139,6 @@ def run_module():
     result['globalFlag'] = module.params['globalFlag']
 
     args = []
-    check_args = []
 
     if module.params['ttl']:
         args.append(module.params['ttl'])

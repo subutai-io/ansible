@@ -15,32 +15,32 @@ short_description: subutai proxy module
 version_added: "2.5"
 
 description:
-    - "configure network proxy for containers in subutai"
+    - Configure network proxy for containers in subutai.
 
 options:
     command:
         description:
-            - create, update, delete
+            - Create, update, delete.
         required: true
     vlan:
         description:
-            - VLAN name
+            - VLAN name.
         required: false
     domain:
         description:
-            - add domain to VLAN
+            - Add domain to VLAN.
         required: false
     host:
         description:
-            - add host to domain on VLAN
+            - Add host to domain on VLAN.
         required: false
     policy:
         description:
-            - set load balance policy (rr|lb|hash)
+            - Set load balance policy (rr|lb|hash).
         required: false
     file:
         description:
-            - pem certificate file
+            - Pem certificate file.
         required: false
 
 extends_documentation_fragment:
@@ -103,10 +103,10 @@ EXAMPLES = '''
 
 RETURN = '''
 container:
-    description: Container affected
+    description: Container affected.
     type: str
 message:
-    description: The output message that the sample module generates
+    description: The output message that the sample module generates.
 '''
 
 import subprocess
@@ -121,7 +121,7 @@ def run_module():
         vlan=dict(type='str', required=True),
         domain=dict(type='str', required=False),
         host=dict(type='str', required=False),
-        policy=dict(type='str', required=False),
+        policy=dict(type='str', required=False, choices=['rr', 'lb', 'hash']),
         file=dict(type='str', required=False),
 
     )

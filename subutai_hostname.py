@@ -10,21 +10,21 @@ DOCUMENTATION = '''
 ---
 module: subutai_hostname
 
-short_description: subutai hostname module
+short_description: Subutai hostname module
 
 version_added: "2.5"
 
 description:
-    - "change hostname of container or host"
+    - Change hostname of container or host.
 
 options:
     container:
         description:
-            - name of container
+            - Name of container.
         required: true
     newname:
         description:
-            - template version
+            - Template version.
         required: true
 
 extends_documentation_fragment:
@@ -45,10 +45,10 @@ EXAMPLES = '''
 
 RETURN = '''
 container:
-    description: Container affected
+    description: Container affected.
     type: str
 message:
-    description: The output message that the sample module generates
+    description: The output message that the sample module generates.
 '''
 
 import subprocess
