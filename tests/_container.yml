@@ -28,7 +28,7 @@
       debug:
         msg: '{{ testout }}'
 
-    - name: run subutai import nginx
+    - name: run subutai destroy nginx
       subutai_container:
         name: 'nginx'
         state: absent
@@ -39,7 +39,7 @@
       debug:
         msg: '{{ testout }}'
 
-    - name: run subutai import nginx [2nd run]
+    - name: run subutai destroy nginx [2nd run]
       subutai_container:
         name: 'nginx'
         state: absent
@@ -54,6 +54,28 @@
       subutai_container:
         name: 'nginx'
         state: latest
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: run subutai start nginx
+      subutai_container:
+        name: 'nginx'
+        state: started
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: run subutai stop nginx
+      subutai_container:
+        name: 'nginx'
+        state: stopped
       become: true
       register: testout
 

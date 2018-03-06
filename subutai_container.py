@@ -26,7 +26,7 @@ options:
         description:
         - Indicates the desired container state are installed.
         default: present
-        choices: [ absent, present, latest ]
+        choices: [ absent, present, latest, started, stopped ]
     version:
         description:
             - template version
@@ -80,139 +80,205 @@ message:
 import subprocess
 from ansible.module_utils.basic import AnsibleModule
 
+class Container():
+    def __init__(self):
+        # parameters
+        self.module_args = dict(
+            name=dict(type='str', required=True),
+            version=dict(type='str', required=False),
+            token=dict(type='str', required=False),
+            check=dict(type='bool', required=False),
+            state=dict(type='str', default='present', choices=['absent', 'present', 'latest', 'started', 'stopped']),
+        )
 
-def run_module():
+        self.module = AnsibleModule(
+            argument_spec=self.module_args,
+            supports_check_mode=True
+        )
 
-    # parameters
-    module_args = dict(
-        name=dict(type='str', required=True),
-        version=dict(type='str', required=False),
-        token=dict(type='str', required=False),
-        check=dict(type='bool', required=False),
-        state=dict(type='str', default='present', choices=['absent', 'present', 'latest']),
-    )
+        # skell to result
+        self.result = self.module.params.copy()
+        self.result['changed'] = False
+        self.result['message'] = ''
 
-    # skell to result
-    result = dict(
-        changed=False,
-        name='',
-        version='',
-        message='',
-        state='',
-    )
+        # check mode, don't made any changes
+        #if self.module.check_mode:
+        #    return self.result
 
-    module = AnsibleModule(
-        argument_spec=module_args,
-        supports_check_mode=True
-    )
+        self.args = []
 
-    # check mode, don't made any changes
-    if module.check_mode:
-        return result
+        if self.module.params['check']:
+            self.args.append("-c")
+        
+        if self.module.params['version']:
+            self.args.append("-v")
+            self.args.append(self.module.params['version'])
 
-    result['name'] = module.params['name']
-    result['version'] = module.params['version']
-    result['token'] = module.params['token']
-    result['state'] = module.params['state']
+        if self.module.params['token']:
+            self.args.append("-t")
+            self.args.append(self.module.params['token'])
 
-    args = []
+        if self.module.params['state'] == 'present':
+            self._import()
 
-    if module.params['check']:
-        args.append("-c")
+        if self.module.params['state'] == 'absent':
+            self._destroy()
+
+        if self.module.params['state'] == 'latest':
+            self._update()
+
+        if self.module.params['state'] == 'started':
+            self._start()
+
+        if self.module.params['state'] == 'stopped':
+            self._stop()
+
     
-    if module.params['version']:
-        args.append("-v")
-        args.append(module.params['version'])
+    def _start(self):
+        if self._is_running():
+            self.result['changed'] = False
+            self._exit()
 
-    if module.params['token']:
-        args.append("-t")
-        args.append(module.params['token'])
+        # verify if container is already installed
+        if not self._is_installed():
+            self.result['changed'] = True
+            self.result['message'] = 'not installed'
 
-    if module.params['state'] == 'present':
-        import_container(module, args, result)
+            self._subutai_cmd("import")
 
-    if module.params['state'] == 'absent':
-        destroy_container(module, args, result)
+            # try demote container
+            self._subutai_cmd("demote")
 
-    if module.params['state'] == 'latest':
-        update_container(module, args, result)
+            # try start container
+            if self._subutai_cmd("start"):
+                self._return_fail("Start Error")
 
+            if self._is_running():
+                self.result['changed'] = True
 
-def update_container(module, args, result):
-    # verify if container is already installed
-    if not is_installed(module.params['name']):
-        result['changed'] = True
-        result['message'] = 'not installed'
-        err_msg = subprocess.Popen(
-            ["/snap/bin/subutai", "import", module.params['name']] + args, stderr=subprocess.PIPE).stderr.read()
-        if err_msg:
-            result['message'] = '[Err] ' + err_msg
-            result['changed'] = False
-            module.fail_json(msg='[Err] ' + err_msg, **result)
-        module.exit_json(**result)
-
-    else:
-        # try update container
-        err_msg = subprocess.Popen(
-            ["/snap/bin/subutai", "update", module.params['name'], args], stderr=subprocess.PIPE).stderr.read()
-        if err_msg:
-            result['message'] = '[Err] ' + err_msg
-            result['changed'] = False
-            module.fail_json(msg='[Err] ' + err_msg, **result)
         else:
-            result['changed'] = True
-            module.exit_json(**result)
+            # try demote container
+            self._subutai_cmd("demote")
 
+            # try start container
+            if self._subutai_cmd("start"):
+                self._return_fail("Start Error")
 
-def destroy_container(module, args, result):
-    # verify if container is already installed
-    if not is_installed(module.params['name']):
-        result['changed'] = False
-        result['message'] = 'not installed'
-        module.exit_json(**result)
+            if self._is_running():
+                self.result['changed'] = True
+            
+        self._exit()
 
-    else:
-        # try destroy container
-        err_msg = subprocess.Popen(
-            ["/snap/bin/subutai", "destroy", module.params['name']], stderr=subprocess.PIPE).stderr.read()
-        if err_msg:
-            result['message'] = '[Err] ' + err_msg
-            result['changed'] = False
-            module.fail_json(msg='[Err] ' + err_msg, **result)
+    def _stop(self):
+        # verify if container is already installed
+        if not self._is_installed():
+            self.result['changed'] = True
+            self.result['message'] = 'not installed'
+
+            self._subutai_cmd("import")
+
+            # try demote container
+            self._subutai_cmd("demote")
+
+            # try stop container
+            if self._subutai_cmd("stop"):
+                self._return_fail("Stop Error")
+
+            if self._is_running():
+                self.result['changed'] = True
+
         else:
-            result['changed'] = True
-            module.exit_json(**result)
+            if not self._is_running():
+                self.result['changed'] = False
+                self._exit()
+            # try demote container
+            self._subutai_cmd("demote")
 
-def import_container(module, args, result):
-    # verify if container is already installed
-    if is_installed(module.params['name']):
-        result['changed'] = False
-        result['message'] = 'already installed'
-        module.exit_json(**result)
-    else:
-        # try install container
+            # try start container
+            if self._subutai_cmd("stop"):
+                self._return_fail("Stop Error")
+
+            if not self._is_running():
+                self.result['changed'] = True
+            
+        self._exit()
+
+    def _update(self):
+        # verify if container is already installed
+        if not self._is_installed():
+            self.result['changed'] = True
+            self.result['message'] = 'not installed'
+            self._subutai_cmd("import")
+            self._exit()
+
+        else:
+            self._subutai_cmd("demote")
+            if self._subutai_cmd("start"):
+                self._return_fail("Start Error")
+
+            # try update container
+            if self._subutai_cmd("update"):
+                self._return_fail("Update Error")
+            self.result['changed'] = True
+            self._exit()
+
+    def _destroy(self):
+        if not self._is_installed():
+            self.result['changed'] = False
+            self._exit()
+        else:
+            # try destroy container
+            if self._subutai_cmd("destroy"):
+                self._return_fail("Destroy Error")
+            self.result['changed'] = True
+            self._exit()        
+    
+    def _import(self):
+        # verify if container is already installed
+        if self._is_installed():
+            self.result['changed'] = False
+            self.result['message'] = 'already installed'
+        else:
+            # try install container
+            if self._subutai_cmd("import"):
+                self._return_fail("Import Error")
+            
+            if self._is_installed():
+                self.result['changed'] = True
+
+        self._exit()
+
+    def _exit(self):
+        self.module.exit_json(**self.result)
+
+    def _return_fail(self, err_msg):
+        self.result['message'] = '[Err] ' + err_msg
+        self.result['changed'] = False
+        self.module.fail_json(msg='[Err] ' + err_msg, **self.result)
+
+    def _is_installed(self):
+        out = subprocess.Popen(
+            ["/snap/bin/subutai", "list"], stdout=subprocess.PIPE).stdout.read()
+        if self.module.params['name']+'\n' in out:
+            return True
+        else:
+            return False
+
+    def _is_running(self):
+        out = subprocess.Popen(
+            ["/snap/bin/subutai", "list", "-i", self.module.params['name']], stdout=subprocess.PIPE).stdout.read()
+        if bytes("RUNNING") in out:
+            return True
+        else:
+            return False
+
+    def _subutai_cmd(self, cmd):
         err_msg = subprocess.Popen(
-            ["/snap/bin/subutai", "import", module.params['name']] + args, stderr=subprocess.PIPE).stderr.read()
-        if err_msg:
-            result['message'] = '[Err] ' + err_msg
-            result['changed'] = False
-            module.fail_json(msg='[Err] ' + err_msg, **result)
-
-        if is_installed(module.params['name']):
-            result['changed'] = True
-
-    module.exit_json(**result)
-
-def is_installed(name):
-    out = subprocess.Popen(
-        ["/snap/bin/subutai", "list"], stdout=subprocess.PIPE).stdout.read()
-    if name+'\n' in out:
-        return True
-    else:
-        return False
+            ["/snap/bin/subutai", cmd, self.module.params['name']] + self.args, stderr=subprocess.PIPE).stderr.read()
+        return err_msg
 
 def main():
-    run_module()
+    c = Container()
 
 if __name__ == '__main__':
     main()

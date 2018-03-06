@@ -19,7 +19,5 @@
 - import_playbook: _promote.yml
 - import_playbook: _proxy.yml
 - import_playbook: _quota.yml
-- import_playbook: _start.yml
-- import_playbook: _stop.yml
 - import_playbook: _tunnel.yml
 - import_playbook: _vxlan.yml
