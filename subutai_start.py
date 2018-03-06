@@ -76,9 +76,7 @@ def run_module():
     result['container'] = module.params['container']
 
     # verify if container is already started
-    out = subprocess.Popen(
-        ["/snap/bin/subutai", "list", "-i", module.params['container']], stdout=subprocess.PIPE).stdout.read()
-    if bytes("RUNNING") in out:
+    if is_running(module.params['container']):
         result['changed'] = False
         result['message'] = 'already started'
 
@@ -91,12 +89,18 @@ def run_module():
             result['changed'] = False
             module.fail_json(msg='[Err] ' + err_msg, **result)
 
-        out = subprocess.Popen(
-            ["/snap/bin/subutai", "list", "-i", module.params['container']], stdout=subprocess.PIPE).stdout.read()
-        if bytes("RUNNING") in out:
+        if is_running(module.params['container']):
             result['changed'] = True
 
     module.exit_json(**result)
+
+def is_running(container):
+    out = subprocess.Popen(
+        ["/snap/bin/subutai", "list", "-i", container], stdout=subprocess.PIPE).stdout.read()
+    if bytes("RUNNING") in out:
+        return True
+    else:
+        return False
 
 
 def main():
