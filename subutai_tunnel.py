@@ -12,7 +12,7 @@ module: subutai_tunnel
 
 short_description: Subutai tunnel module.
 
-version_added: "2.5"
+version_added: "2.6"
 
 description:
     - Configure network tunnel for containers in subutai.

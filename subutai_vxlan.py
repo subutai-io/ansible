@@ -12,7 +12,7 @@ module: subutai_vxlan
 
 short_description: Subutai vxlan module.
 
-version_added: "2.5"
+version_added: "2.6"
 
 description:
     - Configure vxlan tunnels.

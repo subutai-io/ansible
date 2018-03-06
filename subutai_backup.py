@@ -12,7 +12,7 @@ module: subutai_backup
 
 short_description: subutai backup module
 
-version_added: "2.5"
+version_added: "2.6"
 
 description:
     - Backup containers in subutai.

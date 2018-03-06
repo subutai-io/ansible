@@ -12,7 +12,7 @@ module: subutai_promote
 
 short_description: Subutai promote module.
 
-version_added: "2.5"
+version_added: "2.6"
 
 description:
     - Promotes container to template in subutai.

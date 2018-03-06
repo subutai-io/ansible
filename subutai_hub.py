@@ -12,7 +12,7 @@ module: subutai_hub
 
 short_description: Subutai register Peer to Hub module.
 
-version_added: "2.5"
+version_added: "2.6"
 
 description:
     - Register Peer to Hub.

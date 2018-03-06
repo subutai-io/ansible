@@ -12,7 +12,7 @@ module: subutai_cleanup
 
 short_description: Subutai cleanup module.
 
-version_added: "2.5"
+version_added: "2.6"
 
 description:
     - Cleanup subutai enviroment.

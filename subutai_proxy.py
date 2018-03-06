@@ -12,7 +12,7 @@ module: subutai_proxy
 
 short_description: subutai proxy module
 
-version_added: "2.5"
+version_added: "2.6"
 
 description:
     - Configure network proxy for containers in subutai.

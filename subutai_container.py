@@ -12,7 +12,7 @@ module: subutai_container
 
 short_description: subutai container module
 
-version_added: "2.5"
+version_added: "2.6"
 
 description:
     - This modules manage all life cicle of subutai containers.

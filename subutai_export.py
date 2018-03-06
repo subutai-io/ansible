@@ -12,7 +12,7 @@ module: subutai_export
 
 short_description: Subutai export module.
 
-version_added: "2.5"
+version_added: "2.6"
 
 description:
     - Export containers in subutai.

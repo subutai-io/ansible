@@ -12,7 +12,7 @@ module: subutai_hostname
 
 short_description: Subutai hostname module
 
-version_added: "2.5"
+version_added: "2.6"
 
 description:
     - Change hostname of container or host.

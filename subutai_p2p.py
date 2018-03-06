@@ -12,7 +12,7 @@ module: Subutai_p2p.
 
 short_description: subutai p2p module
 
-version_added: "2.5"
+version_added: "2.6"
 
 description:
     - Configure network p2p for containers in subutai.

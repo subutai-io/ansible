@@ -12,7 +12,7 @@ module: subutai_quota
 
 short_description: Subutai quota module.
 
-version_added: "2.5"
+version_added: "2.6"
 
 description:
     - Set quotas for Subutai container.
