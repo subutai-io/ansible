@@ -3,60 +3,63 @@
 ANSIBLE_METADATA = {
     'metadata_version': '1.0',
     'status': ['preview'],
-    'supported_by': 'curated'
+    'supported_by': 'community'
 }
 
 DOCUMENTATION = '''
 ---
 module: subutai_hub
 
-short_description: subutai register Peer to Hub module
+short_description: Subutai register Peer to Hub module.
 
-version_added: "2.5"
+version_added: "2.6"
 
 description:
-    - "register Peer to Hub"email=liquuid@gmail.com&peerName=rz12&password=******&peerScope=Public
+    - Register Peer to Hub.
 requirements:
     - requests
 options:
     command:
         description:
-            - options are register, unregister
+            - Options are register, unregister.
         required: true
     console:
         description:
-            - The URL of subutai console to be registered
+            - The URL of subutai console to be registered.
         required: true
     console_username:
         description:
-            - Console username
+            - Console username.
         required: true
     console_password:
         description:
-            - Console password
+            - Console password.
         required: true
     email:
         description:
-            - Email registered on Hub
-        required: false
+            - Email registered on Hub.
+
     peer_name:
         description:
-            - Name of Peer on hub
-        required: false
+            - Name of Peer on hub.
+
     peer_scope:
         description:
-            - options are Public, Private
-        required: false
+            - Options are Public, Private.
+
     hub_password:
         description:
-            - Hub password
-        required: false
+            - Hub password.
+
 
 extends_documentation_fragment:
     - subutai
+requirements:
+    - python-requests (python 2)
+    - python3-requests (python 3)
 
 author:
-    - Fernando Silva (fsilva@optimal-dynamics.com)
+    - Fernando Silva (@liquuid)
 '''
 
 EXAMPLES = '''
@@ -95,10 +98,10 @@ EXAMPLES = '''
 
 RETURN = '''
 container:
-    description: Container affected
+    description: Container affected.
     type: str
 message:
-    description: The output message that the sample module generates
+    description: The output message that the sample module generates.
 '''
 
 import subprocess

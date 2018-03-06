@@ -3,19 +3,19 @@
 ANSIBLE_METADATA = {
     'metadata_version': '1.0',
     'status': ['preview'],
-    'supported_by': 'curated'
+    'supported_by': 'community'
 }
 
 DOCUMENTATION = '''
 ---
-module: subutai_p2p
+module: Subutai_p2p.
 
 short_description: subutai p2p module
 
-version_added: "2.5"
+version_added: "2.6"
 
 description:
-    - "configure network p2p for containers in subutai"
+    - Configure network p2p for containers in subutai.
 
 options:
     command:
@@ -25,34 +25,32 @@ options:
     interface:
         description:
             - Interface name
-        required: false
+
     hash:
         description:
             - hash
-        required: false
+
     key:
         description:
             - key
-        required: false
+
     ttl:
         description:
             - ttl
-        required: false
+
     localPeepIPAddr:
         description:
             - localPeepIPAddr
-        required: false
+
     portrange :
         description:
             - portrange
-        required: false
-
 
 extends_documentation_fragment:
     - subutai
 
 author:
-    - Fernando Silva (fsilva@optimal-dynamics.com)
+    - Fernando Silva (@liquuid)
 '''
 
 EXAMPLES = '''
@@ -116,7 +114,7 @@ def run_module():
 
     # parameters
     module_args = dict(
-        command=dict(type='str', required=True),
+        command=dict(type='str', required=True, choices=),
         interface=dict(type='str', required=False),
         hash=dict(type='str', required=False),
         key=dict(type='str', required=False),

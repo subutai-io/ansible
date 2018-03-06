@@ -3,51 +3,51 @@
 ANSIBLE_METADATA = {
     'metadata_version': '1.0',
     'status': ['preview'],
-    'supported_by': 'curated'
+    'supported_by': 'community'
 }
 
 DOCUMENTATION = '''
 ---
 module: subutai_clone
 
-short_description: subutai clone module
+short_description: Subutai clone module.
 
-version_added: "2.5"
+version_added: "2.6"
 
 description:
-    - "clone containers in subutai"
+    - Clone containers in subutai.
 
 options:
     parent:
         description:
-            - name of parent
+            - Name of parent container.
         required: true
     child:
         description:
-            - name of child
+            - Name of child container.
         required: true
     env:
         description:
-            - set environment id for container
-        required: false
+            - Set environment id for container.
+
     ipaddr:
         description:
-            - set container IP address and VLAN
-        required: false
+            - Set container IP address and VLAN.
+
     token:
         description:
-            - token to verify with MH  
-        required: false
+            - Token to verify with subutai's Bazaar.
+
     kurjun_token:
         description:
-            - kurjun token to clone private and shared templates
-        required: false
+            - Kurjun token to clone private and shared templates.
+
 
 extends_documentation_fragment:
     - subutai
 
 author:
-    - Fernando Silva (fsilva@optimal-dynamics.com)
+    - Fernando Silva (@liquuid)
 '''
 
 EXAMPLES = '''
@@ -61,10 +61,10 @@ EXAMPLES = '''
 
 RETURN = '''
 container:
-    description: Container affected
+    description: Container affected.
     type: str
 message:
-    description: The output message that the sample module generates
+    description: The output message that the sample module generates.
 '''
 
 import subprocess

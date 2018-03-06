@@ -3,7 +3,7 @@
 ANSIBLE_METADATA = {
     'metadata_version': '1.0',
     'status': ['preview'],
-    'supported_by': 'curated'
+    'supported_by': 'community'
 }
 
 DOCUMENTATION = '''
@@ -12,39 +12,40 @@ module: subutai_container
 
 short_description: subutai container module
 
-version_added: "2.5"
+version_added: "2.6"
 
 description:
-    - "This manage containers with subutai"
+    - This modules manage all life cicle of subutai containers.
 
 options:
     name:
         description:
-            - name of container
+            - Name of container.
         required: true
     state:
         description:
         - Indicates the desired container state are installed.
         default: present
+        required: true
         choices: [ absent, present, latest, started, stopped ]
     version:
         description:
-            - template version
-        required: false
+            - Template version.
+
     token:
         description:
-            - token to access private repo
-        required: false
+            - Token to access private repo.
+
     check:
         description:
-            - check for updates without installation
-        required: false
+            - Check for updates without installation.
+
 
 extends_documentation_fragment:
     - subutai
 
 author:
-    - Fernando Silva (fsilva@optimal-dynamics.com)
+    - Fernando Silva (@liquuid)
 '''
 
 EXAMPLES = '''
@@ -71,10 +72,10 @@ EXAMPLES = '''
 
 RETURN = '''
 container:
-    description: Container affected
+    description: Container affected.
     type: str
 message:
-    description: The output message that the sample module generates
+    description: The output message that the sample module generates.
 '''
 
 import subprocess
@@ -102,8 +103,8 @@ class Container():
         self.result['message'] = ''
 
         # check mode, don't made any changes
-        #if self.module.check_mode:
-        #    return self.result
+        if self.module.check_mode:
+            self._exit()
 
         self.args = []
 
@@ -278,7 +279,7 @@ class Container():
         return err_msg
 
 def main():
-    c = Container()
+    Container()
 
 if __name__ == '__main__':
     main()

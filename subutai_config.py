@@ -3,7 +3,7 @@
 ANSIBLE_METADATA = {
     'metadata_version': '1.0',
     'status': ['preview'],
-    'supported_by': 'curated'
+    'supported_by': 'community'
 }
 
 DOCUMENTATION = '''
@@ -12,15 +12,15 @@ module: subutai_config
 
 short_description: subutai config module
 
-version_added: "2.5"
+version_added: "2.6"
 
 description:
-    - "configure containers in subutai"
+    - Configure containers in subutai.
 
 options:
     container:
         description:
-            - name of container
+            - Name of container.
         required: true
     operation:
         description:
@@ -39,7 +39,7 @@ extends_documentation_fragment:
     - subutai
 
 author:
-    - Fernando Silva (fsilva@optimal-dynamics.com)
+    - Fernando Silva (@liquuid)
 '''
 
 EXAMPLES = '''
@@ -70,7 +70,7 @@ def run_module():
     # parameters
     module_args = dict(
         container=dict(type='str', required=True),
-        operation=dict(type='str', required=True),
+        operation=dict(type='str', required=True, choices=['add', 'del']),
         key=dict(type='str', required=True),
         value=dict(type='str', required=False),
     )

@@ -3,31 +3,31 @@
 ANSIBLE_METADATA = {
     'metadata_version': '1.0',
     'status': ['preview'],
-    'supported_by': 'curated'
+    'supported_by': 'community'
 }
 
 DOCUMENTATION = '''
 ---
 module: subutai_cleanup
 
-short_description: subutai cleanup module
+short_description: Subutai cleanup module.
 
-version_added: "2.5"
+version_added: "2.6"
 
 description:
-    - "Cleanup subutai enviroment"
+    - Cleanup subutai enviroment.
 
 options:
     vlan:
         description:
-            - name of vlan
+            - Name of vlan.
         required: true
 
 extends_documentation_fragment:
     - subutai
 
 author:
-    - Fernando Silva (fsilva@optimal-dynamics.com)
+    - Fernando Silva (@liquuid)
 '''
 
 EXAMPLES = '''
@@ -40,10 +40,10 @@ EXAMPLES = '''
 
 RETURN = '''
 container:
-    description: Container affected
+    description: Container affected.
     type: str
 message:
-    description: The output message that the sample module generates
+    description: The output message that the sample module generates.
 '''
 
 import subprocess

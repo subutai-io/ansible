@@ -3,51 +3,51 @@
 ANSIBLE_METADATA = {
     'metadata_version': '1.0',
     'status': ['preview'],
-    'supported_by': 'curated'
+    'supported_by': 'community'
 }
 
 DOCUMENTATION = '''
 ---
 module: subutai_export
 
-short_description: subutai export module
+short_description: Subutai export module.
 
-version_added: "2.5"
+version_added: "2.6"
 
 description:
-    - "export containers in subutai"
+    - Export containers in subutai.
 
 options:
     container:
         description:
-            - name of container
+            - Name of container.
         required: true
     version:
         description:
-            - template version
-        required: false
+            - Template version.
+
     size:
         description:
-            - template preferred size -- tiny, small, medium, large, huge
-        required: false
+            - Template preferred size -- tiny, small, medium, large, huge.
+
     token:
         description:
             - token to access private repo
-        required: false
+
     description:
         description:
             - template description
-        required: false
+
     private:
         description:
             - use private repo for uploading template
-        required: false
+
 
 extends_documentation_fragment:
     - subutai
 
 author:
-    - Fernando Silva (fsilva@optimal-dynamics.com)
+    - Fernando Silva (@liquuid)
 '''
 
 EXAMPLES = '''
@@ -78,7 +78,7 @@ def run_module():
     module_args = dict(
         container=dict(type='str', required=True),
         version=dict(type='str', required=False),
-        size=dict(type='str', required=False),
+        size=dict(type='str', required=False, choices=['tiny', 'small', 'medium', 'large', 'huge']),
         token=dict(type='str', required=False),
         description=dict(type='str', required=False),
         private=dict(type='bool', required=False),

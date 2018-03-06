@@ -3,7 +3,7 @@
 ANSIBLE_METADATA = {
     'metadata_version': '1.0',
     'status': ['preview'],
-    'supported_by': 'curated'
+    'supported_by': 'community'
 }
 
 DOCUMENTATION = '''
@@ -12,42 +12,41 @@ module: subutai_proxy
 
 short_description: subutai proxy module
 
-version_added: "2.5"
+version_added: "2.6"
 
 description:
-    - "configure network proxy for containers in subutai"
+    - Configure network proxy for containers in subutai.
 
 options:
     command:
         description:
-            - create, update, delete
+            - Create, update, delete.
         required: true
     vlan:
         description:
-            - VLAN name
-        required: false
+            - VLAN name.
+
     domain:
         description:
-            - add domain to VLAN
-        required: false
+            - Add domain to VLAN.
+
     host:
         description:
-            - add host to domain on VLAN
-        required: false
+            - Add host to domain on VLAN.
+
     policy:
         description:
-            - set load balance policy (rr|lb|hash)
-        required: false
+            - Set load balance policy (rr|lb|hash).
+
     file:
         description:
-            - pem certificate file
-        required: false
+            - Pem certificate file.
 
 extends_documentation_fragment:
     - subutai
 
 author:
-    - Fernando Silva (fsilva@optimal-dynamics.com)
+    - Fernando Silva (@liquuid)
 '''
 
 EXAMPLES = '''
@@ -103,10 +102,10 @@ EXAMPLES = '''
 
 RETURN = '''
 container:
-    description: Container affected
+    description: Container affected.
     type: str
 message:
-    description: The output message that the sample module generates
+    description: The output message that the sample module generates.
 '''
 
 import subprocess
@@ -121,7 +120,7 @@ def run_module():
         vlan=dict(type='str', required=True),
         domain=dict(type='str', required=False),
         host=dict(type='str', required=False),
-        policy=dict(type='str', required=False),
+        policy=dict(type='str', required=False, choices=['rr', 'lb', 'hash']),
         file=dict(type='str', required=False),
 
     )

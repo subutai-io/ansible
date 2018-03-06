@@ -3,43 +3,43 @@
 ANSIBLE_METADATA = {
     'metadata_version': '1.0',
     'status': ['preview'],
-    'supported_by': 'curated'
+    'supported_by': 'community'
 }
 
 DOCUMENTATION = '''
 ---
 module: subutai_quota
 
-short_description: subutai quota module
+short_description: Subutai quota module.
 
-version_added: "2.5"
+version_added: "2.6"
 
 description:
-    - "set quotas for Subutai container"
+    - Set quotas for Subutai container.
 
 options:
     container:
         description:
-            - name of container
+            - Name of container.
         required: true
     resource:
         description:
-            - cpu, cpuset, ram, disk, network
+            - Cpu, cpuset, ram, disk, network.
         required: true
     set:
         description:
-            - set quota for the specified resource
+            - Set quota for the specified resource.
         required: true
     threshold:
         description:
-            - set alert threshold
+            - Set alert threshold.
         required: true
 
 extends_documentation_fragment:
     - subutai
 
 author:
-    - Fernando Silva (fsilva@optimal-dynamics.com)
+    - Fernando Silva (@liquuid)
 '''
 
 EXAMPLES = '''
@@ -55,10 +55,10 @@ EXAMPLES = '''
 
 RETURN = '''
 container:
-    description: Container affected
+    description: Container affected.
     type: str
 message:
-    description: The output message that the sample module generates
+    description: The output message that the sample module generates.
 '''
 
 import subprocess
@@ -70,7 +70,7 @@ def run_module():
     # parameters
     module_args = dict(
         container=dict(type='str', required=True),
-        resource=dict(type='str', required=True),
+        resource=dict(type='str', required=True, choices=['cpu', 'cpuset', 'ram', 'disk', 'network']),
         set=dict(type='str', required=True),
         threshold=dict(type='str', required=True),
     )

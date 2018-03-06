@@ -3,7 +3,7 @@
 ANSIBLE_METADATA = {
     'metadata_version': '1.0',
     'status': ['preview'],
-    'supported_by': 'curated'
+    'supported_by': 'community'
 }
 
 DOCUMENTATION = '''
@@ -12,30 +12,29 @@ module: subutai_backup
 
 short_description: subutai backup module
 
-version_added: "2.5"
+version_added: "2.6"
 
 description:
-    - "backup containers in subutai"
+    - Backup containers in subutai.
 
 options:
     container:
         description:
-            - name of container
+            - The name of container.
         required: true
     full_backup:
         description:
-            - make a full backup
-        required: false
+            - Make a full backup.
+
     stop_container:
         description:
-            - stop container before backup
-        required: false
+            - Stop container before backup.
 
 extends_documentation_fragment:
     - subutai
 
 author:
-    - Fernando Silva (fsilva@optimal-dynamics.com)
+    - Fernando Silva (@liquuid)
 '''
 
 EXAMPLES = '''
@@ -50,10 +49,10 @@ EXAMPLES = '''
 
 RETURN = '''
 container:
-    description: Container affected
+    description: Container affected.
     type: str
 message:
-    description: The output message that the sample module generates
+    description: The output message that the sample module generates.
 '''
 
 import subprocess

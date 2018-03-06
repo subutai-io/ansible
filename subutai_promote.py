@@ -3,35 +3,34 @@
 ANSIBLE_METADATA = {
     'metadata_version': '1.0',
     'status': ['preview'],
-    'supported_by': 'curated'
+    'supported_by': 'community'
 }
 
 DOCUMENTATION = '''
 ---
 module: subutai_promote
 
-short_description: subutai promote module
+short_description: Subutai promote module.
 
-version_added: "2.5"
+version_added: "2.6"
 
 description:
-    - "promotes container to template in subutai"
+    - Promotes container to template in subutai.
 
 options:
     container:
         description:
-            - name of container
+            - Name of container.
         required: true
     source:
         description:
-            -  set the source for promoting
-        required: false
+            - Set the source for promoting.
 
 extends_documentation_fragment:
     - subutai
 
 author:
-    - Fernando Silva (fsilva@optimal-dynamics.com)
+    - Fernando Silva (@liquuid)
 '''
 
 EXAMPLES = '''
@@ -44,10 +43,10 @@ EXAMPLES = '''
 
 RETURN = '''
 container:
-    description: Container affected
+    description: Container affected.
     type: str
 message:
-    description: The output message that the sample module generates
+    description: The output message that the sample module generates.
 '''
 
 import subprocess

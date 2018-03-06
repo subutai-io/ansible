@@ -3,19 +3,19 @@
 ANSIBLE_METADATA = {
     'metadata_version': '1.0',
     'status': ['preview'],
-    'supported_by': 'curated'
+    'supported_by': 'community'
 }
 
 DOCUMENTATION = '''
 ---
 module: subutai_vxlan
 
-short_description: subutai vxlan module
+short_description: Subutai vxlan module.
 
-version_added: "2.5"
+version_added: "2.6"
 
 description:
-    - "configure vxlan tunnels"
+    - Configure vxlan tunnels.
 
 options:
     command:
@@ -24,26 +24,25 @@ options:
         required: true
     name:
         description:
-            - tunnel name
-        required: false
+            - Tunnel name.
+
     remoteip:
         description:
-            - remote IP address
-        required: false
+            - Remote IP address.
+
     vlan:
         description:
-            - vlan name
-        required: false
+            - Vlan name.
+
     vni:
         description:
-            - VXLAN tunnel VNI
-        required: false
+            - VXLAN tunnel VNI.
 
 extends_documentation_fragment:
     - subutai
 
 author:
-    - Fernando Silva (fsilva@optimal-dynamics.com)
+    - Fernando Silva (@liquuid)
 '''
 
 EXAMPLES = '''
@@ -77,10 +76,10 @@ EXAMPLES = '''
 
 RETURN = '''
 container:
-    description: Container affected
+    description: Container affected.
     type: str
 message:
-    description: The output message that the sample module generates
+    description: The output message that the sample module generates.
 '''
 
 import subprocess
@@ -90,7 +89,7 @@ from ansible.module_utils.basic import AnsibleModule
 def run_module():
     # parameters
     module_args = dict(
-        command=dict(type='str', required=True),
+        command=dict(type='str', required=True, choices=['create', 'delete']),
         name=dict(type='str', required=True),
         remoteip=dict(type='str', required=False),
         vlan=dict(type='str', required=False),
@@ -125,7 +124,6 @@ def run_module():
     result['vni'] = module.params['vni']
 
     args = []
-    check_args = []
 
     if module.params['remoteip']:
         args.append("--remoteip")

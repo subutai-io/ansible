@@ -3,7 +3,7 @@
 ANSIBLE_METADATA = {
     'metadata_version': '1.0',
     'status': ['preview'],
-    'supported_by': 'curated'
+    'supported_by': 'community'
 }
 
 DOCUMENTATION = '''
@@ -12,30 +12,29 @@ module: subutai_demote
 
 short_description: subutai demote module
 
-version_added: "2.5"
+version_added: "2.6"
 
 description:
-    - "demotes templates to containers in subutai"
+    - Demotes templates to containers in subutai.
 
 options:
     container:
         description:
-            - name of container
+            - Name of container.
         required: true
     ipaddr:
         description:
-            - IPv4 address, ie 192.168.1.1/24
-        required: false
+            - IPv4 address, ie 192.168.1.1/24 
+
     vlan:
         description:
-            - VLAN tag
-        required: false
+            - VLAN tag.
 
 extends_documentation_fragment:
     - subutai
 
 author:
-    - Fernando Silva (fsilva@optimal-dynamics.com)
+    - Fernando Silva (@liquuid)
 '''
 
 EXAMPLES = '''
@@ -50,10 +49,10 @@ EXAMPLES = '''
 
 RETURN = '''
 container:
-    description: Container affected
+    description: Container affected.
     type: str
 message:
-    description: The output message that the sample module generates
+    description: The output message that the sample module generates.
 '''
 
 import subprocess
