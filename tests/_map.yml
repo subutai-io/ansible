@@ -1,0 +1,69 @@
+---
+- name: map module
+  hosts: localhost
+  port: 2222
+  remote_user: subutai
+  gather_facts: False
+  
+  tasks:    
+    - name: map container's 172.16.31.3 port 3306 to the random port on RH
+      subutai_map:
+        protocol: tcp
+        internal: 172.16.31.3:3306 
+
+      become: true
+      register: testout
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: add 172.16.31.4:3306 to the same group
+      subutai_map:
+        protocol: tcp
+        internal: 172.16.31.4:3306
+        external: 46558
+
+      become: true
+      register: testout
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: remove container 172.16.31.3 from mapping
+      subutai_map:
+        protocol: tcp
+        internal: 172.16.31.3:3306
+        external: 46558
+        remove: 
+
+      become: true
+      register: testout
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: map 172.16.25.12:80 to RH's 8080 with domain name example.com
+      subutai_map:
+        protocol: http
+        internal: 172.16.25.12:80
+        external: 8080
+        domain: example.com
+
+      become: true
+      register: testout
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: add container to existing example.com domain
+      subutai_map:
+        protocol: http
+        internal: 172.16.25.13:80
+        external: 8080
+        domain: example.com
+
+      become: true
+      register: testout
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'

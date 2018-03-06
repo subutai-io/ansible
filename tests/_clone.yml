@@ -1,0 +1,55 @@
+---
+- name: test subutai clone module
+  hosts: localhost
+  port: 2222
+  remote_user: subutai
+  gather_facts: False
+  
+  tasks:
+
+    - name: clone nginx
+      subutai_clone:
+        parent: 'nginx'
+        child: 'nginx-test'
+      become: true
+      register: testout
+        
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: clone nginx [2nd run]
+      subutai_clone:
+        parent: 'management'
+        child: 'nginx-test'
+      become: true
+      register: testout
+        
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: clone zabbix
+      subutai_clone:
+        parent: 'zabbix'
+        child: 'z1'
+        ipaddr: '192.168.0.200/24 10'
+      become: true
+      register: testout
+        
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: clone zabbix [2nd run]
+      subutai_clone:
+        parent: 'zabbix'
+        child: 'z1'
+        ipaddr: '192.168.0.200/24 10'
+      become: true
+      register: testout
+        
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+

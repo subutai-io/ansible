@@ -1,0 +1,84 @@
+---
+- name: import module
+  hosts: localhost
+  port: 2222
+  remote_user: subutai
+  gather_facts: False
+  
+  tasks:
+    - name: run subutai import nginx
+      subutai_container:
+        name: 'nginx'
+        state: present
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: run subutai import nginx [2nd run]
+      subutai_container:
+        name: 'nginx'
+        state: present
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: run subutai destroy nginx
+      subutai_container:
+        name: 'nginx'
+        state: absent
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: run subutai destroy nginx [2nd run]
+      subutai_container:
+        name: 'nginx'
+        state: absent
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: run subutai update nginx
+      subutai_container:
+        name: 'nginx'
+        state: latest
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: run subutai start nginx
+      subutai_container:
+        name: 'nginx'
+        state: started
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: run subutai stop nginx
+      subutai_container:
+        name: 'nginx'
+        state: stopped
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'

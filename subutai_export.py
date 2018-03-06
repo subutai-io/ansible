@@ -55,7 +55,7 @@ EXAMPLES = '''
 - name: export debian container
   subutai_export:
     container: debian
-    size: tiny 
+    size: tiny
     description: foo bar
 
 '''
@@ -70,6 +70,7 @@ message:
 
 import subprocess
 from ansible.module_utils.basic import AnsibleModule
+
 
 def run_module():
 
@@ -104,13 +105,13 @@ def run_module():
         return result
 
     result['container'] = module.params['container']
-    result['version'] =  module.params['version']
+    result['version'] = module.params['version']
     result['size'] = module.params['size']
     result['token'] = module.params['token']
     result['description'] = module.params['description']
     result['private'] = module.params['private']
 
-    args=[]
+    args = []
 
     if module.params['version']:
         args.append("-v")
@@ -132,15 +133,16 @@ def run_module():
         args.append("-p")
         args.append(str(module.params['private']))
 
-
-    err = subprocess.Popen(["/snap/bin/subutai","export", module.params['container']] + args, stderr=subprocess.PIPE).stderr.read()
+    err = subprocess.Popen(
+        ["/snap/bin/subutai", "export", module.params['container']] + args, stderr=subprocess.PIPE).stderr.read()
     if err:
         result['changed'] = False
         module.fail_json(msg='[Err] ' + err, **result)
 
     result['changed'] = True
-        
+
     module.exit_json(**result)
+
 
 def main():
     run_module()

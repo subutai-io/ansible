@@ -86,6 +86,7 @@ message:
 import subprocess
 from ansible.module_utils.basic import AnsibleModule
 
+
 def run_module():
     # parameters
     module_args = dict(
@@ -118,14 +119,14 @@ def run_module():
         return result
 
     result['command'] = module.params['command']
-    result['name'] =  module.params['name']
+    result['name'] = module.params['name']
     result['remoteip'] = module.params['remoteip']
     result['vlan'] = module.params['vlan']
     result['vni'] = module.params['vni']
 
-    args=[]
+    args = []
     check_args = []
-    
+
     if module.params['remoteip']:
         args.append("--remoteip")
         args.append(module.params['remoteip'])
@@ -139,7 +140,8 @@ def run_module():
         args.append(module.params['vni'])
 
     if module.params['command'] == "create":
-        err = subprocess.Popen(["/snap/bin/subutai","vxlan","--create", module.params['name']] + args ,stderr=subprocess.PIPE).stderr.read()
+        err = subprocess.Popen(
+            ["/snap/bin/subutai", "vxlan", "--create", module.params['name']] + args, stderr=subprocess.PIPE).stderr.read()
         if err:
             module.fail_json(msg='[Err] ' + err + str(args), **result)
         else:
@@ -148,10 +150,10 @@ def run_module():
                 module.exit_json(**result)
             else:
                 module.fail_json(msg='[Err] ' + err + str(args), **result)
-                    
-           
+
     elif module.params['command'] == "delete":
-        err = subprocess.Popen(["/snap/bin/subutai","vxlan","--delete", module.params['name']], stderr=subprocess.PIPE).stderr.read()
+        err = subprocess.Popen(
+            ["/snap/bin/subutai", "vxlan", "--delete", module.params['name']], stderr=subprocess.PIPE).stderr.read()
         if err:
             module.fail_json(msg='[Err] ' + err, **result)
         else:
@@ -164,8 +166,10 @@ def run_module():
     else:
         module.fail_json(msg='[Err] ' + str(args), **result)
 
+
 def check_changes():
-    return subprocess.Popen(["/snap/bin/subutai","vxlan","-l"],stdout=subprocess.PIPE).stdout.read()
+    return subprocess.Popen(["/snap/bin/subutai", "vxlan", "-l"], stdout=subprocess.PIPE).stdout.read()
+
 
 def main():
     run_module()

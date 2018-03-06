@@ -59,6 +59,7 @@ message:
 import subprocess
 from ansible.module_utils.basic import AnsibleModule
 
+
 def run_module():
 
     # parameters
@@ -87,37 +88,41 @@ def run_module():
         return result
 
     result['container'] = module.params['container']
-    result['ipaddr'] =  module.params['ipaddr']
+    result['ipaddr'] = module.params['ipaddr']
     result['vlan'] = module.params['vlan']
 
-    args=[]
+    args = []
     if module.params['ipaddr']:
         args.append("-i")
         args.append(module.params['ipaddr'])
-    
+
     if module.params['vlan']:
         args.append("-v")
         args.append(module.params['vlan'])
 
     if not is_demoted(module.params['container']):
-        err = subprocess.Popen(["/snap/bin/subutai","demote",module.params['container']] + args, stderr=subprocess.PIPE).stderr.read()
+        err = subprocess.Popen(
+            ["/snap/bin/subutai", "demote", module.params['container']] + args, stderr=subprocess.PIPE).stderr.read()
         if err:
             result['changed'] = False
             module.fail_json(msg='[Err] ' + err, **result)
         result['changed'] = True
-  
+
     else:
         result['changed'] = False
-        result['message'] = "Already demoted" 
-        
+        result['message'] = "Already demoted"
+
     module.exit_json(**result)
 
+
 def is_demoted(container):
-    output = subprocess.Popen(["/snap/bin/subutai","list","-c",container], stdout=subprocess.PIPE).stdout.read()
+    output = subprocess.Popen(
+        ["/snap/bin/subutai", "list", "-c", container], stdout=subprocess.PIPE).stdout.read()
     if container in output:
         return True
     else:
         return False
+
 
 def main():
     run_module()

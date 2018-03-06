@@ -53,6 +53,7 @@ message:
 import subprocess
 from ansible.module_utils.basic import AnsibleModule
 
+
 def run_module():
 
     # parameters
@@ -78,32 +79,36 @@ def run_module():
         return result
 
     result['container'] = module.params['container']
-    result['source'] =  module.params['source']
+    result['source'] = module.params['source']
 
-    args=[]
+    args = []
     if module.params['source']:
         args.append("-s")
         args.append(module.params['source'])
 
     if not is_promoted(module.params['container']):
-        err = subprocess.Popen(["/snap/bin/subutai","promote",module.params['container']] + args, stderr=subprocess.PIPE).stderr.read()
+        err = subprocess.Popen(
+            ["/snap/bin/subutai", "promote", module.params['container']] + args, stderr=subprocess.PIPE).stderr.read()
         if err:
             result['changed'] = False
             module.fail_json(msg='[Err] ' + err, **result)
         result['changed'] = True
-  
+
     else:
         result['changed'] = False
-        result['message'] = "Already promoted" 
-        
+        result['message'] = "Already promoted"
+
     module.exit_json(**result)
 
+
 def is_promoted(container):
-    output = subprocess.Popen(["/snap/bin/subutai","list","-t",container], stdout=subprocess.PIPE).stdout.read()
+    output = subprocess.Popen(
+        ["/snap/bin/subutai", "list", "-t", container], stdout=subprocess.PIPE).stdout.read()
     if container in output:
         return True
     else:
         return False
+
 
 def main():
     run_module()

@@ -1,0 +1,63 @@
+---
+- name: test subutai config module
+  hosts: localhost
+  port: 2222
+  remote_user: subutai
+  gather_facts: False
+  
+  tasks:
+
+  # config container
+  - name: add config nginx container
+    subutai_config:
+      container: nginx
+      operation: add
+      key: foo
+      value: bar
+    become: true
+    register: testout
+        
+  - name: dump test output
+    debug:
+      msg: '{{ testout }}'
+
+  # config container
+  - name: add config nginx container
+    subutai_config:
+      container: nginx
+      operation: add
+      key: foo
+      value: bar
+    become: true
+    register: testout
+        
+  - name: dump test output
+    debug:
+      msg: '{{ testout }}'
+
+  # config container
+  - name: del config nginx container
+    subutai_config:
+      container: nginx
+      operation: del
+      key: foo
+    become: true
+    register: testout
+        
+  - name: dump test output
+    debug:
+      msg: '{{ testout }}'
+
+
+  # config container
+  - name: del config nginx container
+    subutai_config:
+      container: nginx
+      operation: del
+      key: foo
+    become: true
+    register: testout
+        
+  - name: dump test output
+    debug:
+      msg: '{{ testout }}'
