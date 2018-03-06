@@ -11,7 +11,6 @@
 - import_playbook: _clone.yml
 - import_playbook: _config.yml
 - import_playbook: _demote.yml
-- import_playbook: _destroy.yml
 - import_playbook: _export.yml
 - import_playbook: _hostname.yml
 - import_playbook: _hub.yml
