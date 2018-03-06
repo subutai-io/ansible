@@ -103,8 +103,8 @@ class Container():
         self.result['message'] = ''
 
         # check mode, don't made any changes
-        #if self.module.check_mode:
-        #    return self.result
+        if self.module.check_mode:
+            self._exit()
 
         self.args = []
 
@@ -279,7 +279,7 @@ class Container():
         return err_msg
 
 def main():
-    c = Container()
+    Container()
 
 if __name__ == '__main__':
     main()
