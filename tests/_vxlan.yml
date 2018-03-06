@@ -1,0 +1,32 @@
+---
+- name: update module
+  hosts: localhost
+  port: 2222
+  remote_user: subutai
+  gather_facts: False
+  tasks:
+    # vxlan module
+    - name: adding subutai vxlan tunnel
+      subutai_vxlan:
+        command: create
+        name: vxlan1
+        remoteip: 10.220.22.2
+        vlan: 100
+        vni: 12345
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: adding subutai vxlan tunnel
+      subutai_vxlan:
+        command: delete
+        name: vxlan1
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
