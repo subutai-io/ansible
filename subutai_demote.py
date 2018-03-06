@@ -25,11 +25,10 @@ options:
     ipaddr:
         description:
             - IPv4 address, ie 192.168.1.1/24 
-        required: false
+
     vlan:
         description:
             - VLAN tag.
-        required: false
 
 extends_documentation_fragment:
     - subutai

@@ -25,31 +25,30 @@ options:
     internal:
         description:
             - Peer's internal socket that should be exposed. Format should be <ip>:<port>
-        required: false
+
     external:
         description:
             - Optional parameter which shows desired RH socket where internal socket should be mapped. If more than one container mapped to one RH port, those containers are being put to the same backend group. Allowed port value must be in range of 1000-65535
-        required: false
+
     domain:
         description:
             - Should be only specified for http and https protocols mapping.
-        required: false
+
     cert:
         description:
             - Path to SSL pem certificate for https protocol.
-        required: false
+
     policy:
         description:
             - Balancing methods (round-robin by default, least_time, hash, ip_hash).
-        required: false
+
     sslbackend :
         description:
             - SSL backend in https upstream.
-        required: false
+
     remove:
         description:
             - Optional flags shows that specified mapping should be removed. If not set, "add" operation is assumed.
-        required: false
 
 extends_documentation_fragment:
     - subutai

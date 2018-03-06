@@ -38,19 +38,18 @@ options:
     email:
         description:
             - Email registered on Hub.
-        required: false
+
     peer_name:
         description:
             - Name of Peer on hub.
-        required: false
+
     peer_scope:
         description:
             - Options are Public, Private.
-        required: false
+
     hub_password:
         description:
             - Hub password.
-        required: false
 
 extends_documentation_fragment:
     - subutai

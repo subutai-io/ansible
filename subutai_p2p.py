@@ -25,28 +25,26 @@ options:
     interface:
         description:
             - Interface name
-        required: false
+
     hash:
         description:
             - hash
-        required: false
+
     key:
         description:
             - key
-        required: false
+
     ttl:
         description:
             - ttl
-        required: false
+
     localPeepIPAddr:
         description:
             - localPeepIPAddr
-        required: false
+
     portrange :
         description:
             - portrange
-        required: false
-
 
 extends_documentation_fragment:
     - subutai

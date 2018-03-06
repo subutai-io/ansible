@@ -25,7 +25,6 @@ options:
     source:
         description:
             - Set the source for promoting.
-        required: false
 
 extends_documentation_fragment:
     - subutai

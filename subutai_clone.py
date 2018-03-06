@@ -29,19 +29,19 @@ options:
     env:
         description:
             - Set environment id for container.
-        required: false
+
     ipaddr:
         description:
             - Set container IP address and VLAN.
-        required: false
+
     token:
         description:
             - Token to verify with subutai's Bazaar.
-        required: false
+
     kurjun_token:
         description:
             - Kurjun token to clone private and shared templates.
-        required: false
+
 
 extends_documentation_fragment:
     - subutai

@@ -25,19 +25,18 @@ options:
     name:
         description:
             - Tunnel name.
-        required: false
+
     remoteip:
         description:
             - Remote IP address.
-        required: false
+
     vlan:
         description:
             - Vlan name.
-        required: false
+
     vni:
         description:
             - VXLAN tunnel VNI.
-        required: false
 
 extends_documentation_fragment:
     - subutai

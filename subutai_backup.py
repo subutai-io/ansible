@@ -25,11 +25,10 @@ options:
     full_backup:
         description:
             - Make a full backup.
-        required: false
+
     stop_container:
         description:
             - Stop container before backup.
-        required: false
 
 extends_documentation_fragment:
     - subutai

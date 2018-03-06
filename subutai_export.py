@@ -25,23 +25,23 @@ options:
     version:
         description:
             - Template version.
-        required: false
+
     size:
         description:
             - Template preferred size -- tiny, small, medium, large, huge.
-        required: false
+
     token:
         description:
             - token to access private repo
-        required: false
+
     description:
         description:
             - template description
-        required: false
+
     private:
         description:
             - use private repo for uploading template
-        required: false
+
 
 extends_documentation_fragment:
     - subutai

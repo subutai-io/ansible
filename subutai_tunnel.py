@@ -25,15 +25,14 @@ options:
     ipaddr:
         description:
             - IP address.
-        required: false
+
     ttl:
         description:
             - Tunnels may also be set to be permanent (default) or temporary (ttl in seconds).
-        required: false
+
     globalFlag:
         description:
             - There are two types of channels - local (default), which is created from destination address to host and global from destination to Subutai Helper node.
-        required: false
 
 extends_documentation_fragment:
     - subutai

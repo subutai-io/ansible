@@ -26,19 +26,20 @@ options:
         description:
         - Indicates the desired container state are installed.
         default: present
+        required: true
         choices: [ absent, present, latest, started, stopped ]
     version:
         description:
             - Template version.
-        required: false
+
     token:
         description:
             - Token to access private repo.
-        required: false
+
     check:
         description:
             - Check for updates without installation.
-        required: false
+
 
 extends_documentation_fragment:
     - subutai

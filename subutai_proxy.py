@@ -25,23 +25,22 @@ options:
     vlan:
         description:
             - VLAN name.
-        required: false
+
     domain:
         description:
             - Add domain to VLAN.
-        required: false
+
     host:
         description:
             - Add host to domain on VLAN.
-        required: false
+
     policy:
         description:
             - Set load balance policy (rr|lb|hash).
-        required: false
+
     file:
         description:
             - Pem certificate file.
-        required: false
 
 extends_documentation_fragment:
     - subutai
