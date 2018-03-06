@@ -51,8 +51,12 @@ options:
         description:
             - Hub password.
 
+
 extends_documentation_fragment:
     - subutai
+requirements:
+    - python-requests (python 2)
+    - python3-requests (python 3)
 
 author:
     - Fernando Silva (@liquuid)
