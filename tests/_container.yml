@@ -49,3 +49,14 @@
     - name: dump test output
       debug:
         msg: '{{ testout }}'
+
+    - name: run subutai update nginx
+      subutai_container:
+        name: 'nginx'
+        state: latest
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'

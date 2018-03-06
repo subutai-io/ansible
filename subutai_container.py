@@ -26,7 +26,7 @@ options:
         description:
         - Indicates the desired container state are installed.
         default: present
-        choices: [ absent, present ]
+        choices: [ absent, present, latest ]
     version:
         description:
             - template version
@@ -34,6 +34,10 @@ options:
     token:
         description:
             - token to access private repo
+        required: false
+    check:
+        description:
+            - check for updates without installation
         required: false
 
 extends_documentation_fragment:
@@ -57,6 +61,12 @@ EXAMPLES = '''
     state: absent
     become: true
 
+- name: upgrade nginx
+    subutai_container:
+    name: 'nginx'
+    state: latest
+    become: true
+
 '''
 
 RETURN = '''
@@ -78,7 +88,8 @@ def run_module():
         name=dict(type='str', required=True),
         version=dict(type='str', required=False),
         token=dict(type='str', required=False),
-        state=dict(type='str', default='present', choices=['absent', 'present']),
+        check=dict(type='bool', required=False),
+        state=dict(type='str', default='present', choices=['absent', 'present', 'latest']),
     )
 
     # skell to result
@@ -105,6 +116,9 @@ def run_module():
     result['state'] = module.params['state']
 
     args = []
+
+    if module.params['check']:
+        args.append("-c")
     
     if module.params['version']:
         args.append("-v")
@@ -115,44 +129,79 @@ def run_module():
         args.append(module.params['token'])
 
     if module.params['state'] == 'present':
-
-        # verify if container is already installed
-        if is_installed(module.params['name']):
-            result['changed'] = False
-            result['message'] = 'already installed'
-
-        else:
-            # try install container
-            err_msg = subprocess.Popen(
-                ["/snap/bin/subutai", "import", module.params['name']] + args, stderr=subprocess.PIPE).stderr.read()
-            if err_msg:
-                result['message'] = '[Err] ' + err_msg
-                result['changed'] = False
-                module.fail_json(msg='[Err] ' + err_msg, **result)
-
-            if is_installed(module.params['name']):
-                result['changed'] = True
-
-        module.exit_json(**result)
+        import_container(module, args, result)
 
     if module.params['state'] == 'absent':
-        # verify if container is already installed
-        if not is_installed(module.params['name']):
+        destroy_container(module, args, result)
+
+    if module.params['state'] == 'latest':
+        update_container(module, args, result)
+
+
+def update_container(module, args, result):
+    # verify if container is already installed
+    if not is_installed(module.params['name']):
+        result['changed'] = True
+        result['message'] = 'not installed'
+        err_msg = subprocess.Popen(
+            ["/snap/bin/subutai", "import", module.params['name']] + args, stderr=subprocess.PIPE).stderr.read()
+        if err_msg:
+            result['message'] = '[Err] ' + err_msg
             result['changed'] = False
-            result['message'] = 'not installed'
+            module.fail_json(msg='[Err] ' + err_msg, **result)
+        module.exit_json(**result)
+
+    else:
+        # try update container
+        err_msg = subprocess.Popen(
+            ["/snap/bin/subutai", "update", module.params['name'], args], stderr=subprocess.PIPE).stderr.read()
+        if err_msg:
+            result['message'] = '[Err] ' + err_msg
+            result['changed'] = False
+            module.fail_json(msg='[Err] ' + err_msg, **result)
+        else:
+            result['changed'] = True
             module.exit_json(**result)
 
+
+def destroy_container(module, args, result):
+    # verify if container is already installed
+    if not is_installed(module.params['name']):
+        result['changed'] = False
+        result['message'] = 'not installed'
+        module.exit_json(**result)
+
+    else:
+        # try destroy container
+        err_msg = subprocess.Popen(
+            ["/snap/bin/subutai", "destroy", module.params['name']], stderr=subprocess.PIPE).stderr.read()
+        if err_msg:
+            result['message'] = '[Err] ' + err_msg
+            result['changed'] = False
+            module.fail_json(msg='[Err] ' + err_msg, **result)
         else:
-            # try destroy container
-            err_msg = subprocess.Popen(
-                ["/snap/bin/subutai", "destroy", module.params['name']], stderr=subprocess.PIPE).stderr.read()
-            if err_msg:
-                result['message'] = '[Err] ' + err_msg
-                result['changed'] = False
-                module.fail_json(msg='[Err] ' + err_msg, **result)
-            else:
-                result['changed'] = True
-                module.exit_json(**result)
+            result['changed'] = True
+            module.exit_json(**result)
+
+def import_container(module, args, result):
+    # verify if container is already installed
+    if is_installed(module.params['name']):
+        result['changed'] = False
+        result['message'] = 'already installed'
+        module.exit_json(**result)
+    else:
+        # try install container
+        err_msg = subprocess.Popen(
+            ["/snap/bin/subutai", "import", module.params['name']] + args, stderr=subprocess.PIPE).stderr.read()
+        if err_msg:
+            result['message'] = '[Err] ' + err_msg
+            result['changed'] = False
+            module.fail_json(msg='[Err] ' + err_msg, **result)
+
+        if is_installed(module.params['name']):
+            result['changed'] = True
+
+    module.exit_json(**result)
 
 def is_installed(name):
     out = subprocess.Popen(
