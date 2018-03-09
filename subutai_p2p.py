@@ -99,11 +99,12 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-container:
-    description: Container affected
-    type: str
-message:
-    description: The output message that the sample module generates
+stderr:
+    description: Error output from subutai p2p
+    type: string
+    returned: success, when need
+    sample: "FATA[2018-03-09 01:11:53] Creating p2p interface Device with specified name is already in use
+, exit status"
 '''
 
 import subprocess
@@ -114,7 +115,7 @@ def run_module():
 
     # parameters
     module_args = dict(
-        command=dict(type='str', required=True, choices=),
+        command=dict(type='str', required=True, choices=["create", "update", "delete"]),
         interface=dict(type='str', required=False),
         hash=dict(type='str', required=False),
         key=dict(type='str', required=False),
@@ -126,13 +127,7 @@ def run_module():
 
     # skell to result
     result = dict(
-        changed=False,
-        command='',
-        interface='',
-        ttl='',
-        localPeepIPAddr='',
-        portrange='',
-
+        changed=False
     )
 
     module = AnsibleModule(
@@ -143,14 +138,6 @@ def run_module():
     # check mode, don't made any changes
     if module.check_mode:
         return result
-
-    result['command'] = module.params['command']
-    result['interface'] = module.params['interface']
-    result['hash'] = module.params['hash']
-    result['key'] = module.params['key']
-    result['ttl'] = module.params['ttl']
-    result['localPeepIPAddr'] = module.params['localPeepIPAddr']
-    result['portrange'] = module.params['portrange']
 
     args = ["/snap/bin/subutai", "p2p"]
 
@@ -183,6 +170,7 @@ def run_module():
 
     err = subprocess.Popen(args, stderr=subprocess.PIPE).stderr.read()
     if err:
+            result["stderr"] = err
             module.fail_json(msg='[Err] ' + err + str(args), **result)
     else:
         result['changed'] = True

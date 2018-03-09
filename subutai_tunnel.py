@@ -91,11 +91,11 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-container:
-    description: Container affected.
-    type: str
-message:
-    description: The output message that the sample module generates.
+stderr:
+    description: Error output from subutai tunnel
+    type: string
+    returned: success, when need
+    sample: "ERRO[2018-03-09 01:42:20] Resolving nearest tunnel node address, lookup ssh.cdn.subutai.io on 192.168.0.1:53: read udp 192.168.0.112:50717->192.168.0.1:53: i/o timeout "
 '''
 
 import subprocess
@@ -115,11 +115,6 @@ def run_module():
     # skell to result
     result = dict(
         changed=False,
-        message='',
-        command='',
-        ipaddr='',
-        ttl='',
-        globalFlag='',
 
     )
 
@@ -131,11 +126,6 @@ def run_module():
     # check mode, don't made any changes
     if module.check_mode:
         return result
-
-    result['command'] = module.params['command']
-    result['ipaddr'] = module.params['ipaddr']
-    result['ttl'] = module.params['ttl']
-    result['globalFlag'] = module.params['globalFlag']
 
     args = []
 
@@ -149,6 +139,7 @@ def run_module():
         err = subprocess.Popen(
             ["/snap/bin/subutai", "tunnel", "add", module.params['ipaddr']] + args, stderr=subprocess.PIPE).stderr.read()
         if err:
+            result['stderr'] = err
             module.fail_json(msg='[Err] ' + err + str(args), **result)
         else:
             result['changed'] = True
@@ -158,6 +149,7 @@ def run_module():
         err = subprocess.Popen(
             ["/snap/bin/subutai", "tunnel", "del", module.params['ipaddr']], stderr=subprocess.PIPE).stderr.read()
         if err:
+            result['stderr'] = err
             module.fail_json(msg='[Err] ' + err, **result)
         else:
             result['changed'] = True

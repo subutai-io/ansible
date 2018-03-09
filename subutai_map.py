@@ -73,11 +73,11 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-container:
-    description: Container affected.
-    type: str
-message:
-    description: The output message that the sample module generates.
+stderr:
+    description: Error output from subutai map
+    type: string
+    returned: success, when need
+    sample: "ERRO[2018-03-09 01:28:47] Unsupported protocol "
 '''
 
 import subprocess
@@ -93,7 +93,7 @@ def run_module():
         external=dict(type='str', required=False),
         domain=dict(type='str', required=False),
         cert=dict(type='str', required=False),
-        policy=dict(type='str', required=False),
+        policy=dict(type='str', required=False, choices=['round-robin', 'least_time', 'hash', 'ip_hash']),
         sslbackend=dict(type='str', required=False),
         remove=dict(type='bool', required=False),
     )
@@ -101,14 +101,6 @@ def run_module():
     # skell to result
     result = dict(
         changed=False,
-        protocol='',
-        internal='',
-        external='',
-        domain='',
-        cert='',
-        policy='',
-        sslbackend='',
-        remove=''
     )
 
     module = AnsibleModule(
@@ -119,15 +111,6 @@ def run_module():
     # check mode, don't made any changes
     if module.check_mode:
         return result
-
-    result['protocol'] = module.params['protocol']
-    result['internal'] = module.params['internal']
-    result['external'] = module.params['external']
-    result['domain'] = module.params['domain']
-    result['cert'] = module.params['cert']
-    result['policy'] = module.params['policy']
-    result['sslbackend'] = module.params['sslbackend']
-    result['remove'] = module.params['remove']
 
     args = ["/snap/bin/subutai", "map"]
     args.append(module.params['protocol'])
@@ -165,6 +148,7 @@ def run_module():
             result['changed'] = False
             module.exit_json(**result)
         else:
+            result['stderr'] = err
             module.fail_json(msg='[Err] ' + err + str(args), **result)
     else:
         result['changed'] = True

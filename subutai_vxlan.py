@@ -75,11 +75,16 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-container:
-    description: Container affected.
-    type: str
-message:
-    description: The output message that the sample module generates.
+name:
+    description: Name of vlan affected
+    type: string
+    returned: always
+    sample: "vxlan1"
+stderr:
+    description: Error output from subutai vxlan
+    type: string
+    returned: success, when need
+    sample: "Time Out"
 '''
 
 import subprocess
@@ -100,12 +105,7 @@ def run_module():
     # skell to result
     result = dict(
         changed=False,
-        message='',
-        name='',
-        remoteip='',
-        vlan='',
-        vni='',
-
+        name=''
     )
 
     module = AnsibleModule(
@@ -117,11 +117,7 @@ def run_module():
     if module.check_mode:
         return result
 
-    result['command'] = module.params['command']
     result['name'] = module.params['name']
-    result['remoteip'] = module.params['remoteip']
-    result['vlan'] = module.params['vlan']
-    result['vni'] = module.params['vni']
 
     args = []
 
@@ -141,6 +137,7 @@ def run_module():
         err = subprocess.Popen(
             ["/snap/bin/subutai", "vxlan", "--create", module.params['name']] + args, stderr=subprocess.PIPE).stderr.read()
         if err:
+            result['stderr'] = err
             module.fail_json(msg='[Err] ' + err + str(args), **result)
         else:
             if module.params['name'] in check_changes():
@@ -153,6 +150,7 @@ def run_module():
         err = subprocess.Popen(
             ["/snap/bin/subutai", "vxlan", "--delete", module.params['name']], stderr=subprocess.PIPE).stderr.read()
         if err:
+            result['stderr'] = err
             module.fail_json(msg='[Err] ' + err, **result)
         else:
             if module.params['name'] not in check_changes():

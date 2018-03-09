@@ -60,11 +60,21 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-container:
-    description: Container affected.
-    type: str
-message:
-    description: The output message that the sample module generates.
+parent:
+    description: Parent container to be cloned
+    type: string
+    returned: always
+    sample: "apache"
+child:
+    description: Child container to be created
+    type: string
+    returned: always
+    sample: "apache-newconf"
+stderr:
+    description: Error output from subutai clone
+    type: string
+    returned: success, when need
+    sample: "ERRO[2018-03-08 23:45:07] Cloning the container, container is already running: 'management'"
 '''
 
 import subprocess
@@ -76,7 +86,7 @@ def run_module():
     # parameters
     module_args = dict(
         parent=dict(type='str', required=True),
-        child=dict(type='str', required=False),
+        child=dict(type='str', required=True),
         env=dict(type='str', required=False),
         ipaddr=dict(type='str', required=False),
         token=dict(type='str', required=False),
@@ -88,9 +98,8 @@ def run_module():
     result = dict(
         changed=False,
         parent='',
-        env='',
         child='',
-        ipaddr='',
+        stderr=''
     )
 
     module = AnsibleModule(
@@ -104,10 +113,6 @@ def run_module():
 
     result['parent'] = module.params['parent']
     result['child'] = module.params['child']
-    result['env'] = module.params['env']
-    result['ipaddr'] = module.params['ipaddr']
-    result['token'] = module.params['token']
-    result['kurjun_token'] = module.params['kurjun_token']
 
     args = []
     if module.params['env']:
@@ -135,7 +140,7 @@ def run_module():
 
     if out != "" or not container_exists(module.params['child']):
         result['changed'] = False
-        result['message'] = out
+        result['stderr'] = out
         module.fail_json(msg='[Err] ' + out, **result)
     else:
         result['changed'] = True

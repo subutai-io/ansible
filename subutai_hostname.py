@@ -46,9 +46,19 @@ EXAMPLES = '''
 RETURN = '''
 container:
     description: Container affected.
-    type: str
-message:
-    description: The output message that the sample module generates.
+    type: string
+    returned: always
+    sample: "apache"
+newname:
+    description: New hostname of container affected.
+    type: string
+    returned: always
+    sample: "apache-new"
+stderr:
+    description: Error output from subutai hostname
+    type: string
+    returned: success, when need
+    sample: "ERRO[2018-03-09 00:30:13] apache is not an container."
 '''
 
 import subprocess
@@ -87,6 +97,7 @@ def run_module():
                            'container'], module.params['newname']], stderr=subprocess.PIPE).stderr.read()
     if err:
         result['changed'] = False
+        result['stderr'] = err
         module.fail_json(msg='[Err] ' + err, **result)
 
     result['changed'] = True

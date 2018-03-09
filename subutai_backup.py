@@ -50,9 +50,24 @@ EXAMPLES = '''
 RETURN = '''
 container:
     description: Container affected.
-    type: str
-message:
-    description: The output message that the sample module generates.
+    type: string
+    returned: always
+    sample: "apache"
+full_backup:
+    description: If full backup was requested or not
+    type: boolean
+    returned: success, when need
+    sample: True
+stop_container:
+    description: If a stopped container was requested or not
+    type: boolean
+    returned: success, when need
+    sample: True
+stderr:
+    description: Error output from subutai backup
+    type: string
+    returned: success, when need
+    sample: "FATA[2018-03-08 22:09:42] Last backup not found or corrupted. Try make full backup."
 '''
 
 import subprocess
@@ -75,7 +90,7 @@ def run_module():
         container='',
         full_backup='',
         stop_container='',
-        message=''
+        stderr=''
     )
 
     module = AnsibleModule(
@@ -101,6 +116,7 @@ def run_module():
     err = subprocess.Popen(
         ["/snap/bin/subutai", "backup", module.params['container']] + args, stderr=subprocess.PIPE).stderr.read()
     if err:
+        result['stderr'] = err
         module.fail_json(msg='[Err] ' + err, **result)
 
     result['changed'] = True

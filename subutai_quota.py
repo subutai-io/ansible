@@ -56,9 +56,9 @@ EXAMPLES = '''
 RETURN = '''
 container:
     description: Container affected.
-    type: str
-message:
-    description: The output message that the sample module generates.
+    type: string
+    returned: always
+    sample: "apache"
 '''
 
 import subprocess
@@ -78,11 +78,6 @@ def run_module():
     # skell to result
     result = dict(
         changed=False,
-        container='',
-        resource='',
-        set='',
-        threshold='',
-        message=''
     )
 
     module = AnsibleModule(
@@ -95,9 +90,6 @@ def run_module():
         return result
 
     result['container'] = module.params['container']
-    result['resource'] = module.params['resource']
-    result['set'] = module.params['set']
-    result['threshold'] = module.params['threshold']
 
     out = subprocess.Popen(
         ["/snap/bin/subutai", "quota", module.params['container'], module.params['resource'],
