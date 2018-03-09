@@ -44,9 +44,14 @@ EXAMPLES = '''
 RETURN = '''
 container:
     description: Container affected.
-    type: str
-message:
-    description: The output message that the sample module generates.
+    type: string
+    returned: always
+    sample: "apache"
+stderr:
+    description: Error output from subutai promote
+    type: string
+    returned: success, when need
+    sample: "ERRO[2018-03-09 01:31:30] Container apache does not exist"
 '''
 
 import subprocess
@@ -64,8 +69,6 @@ def run_module():
     # skell to result
     result = dict(
         changed=False,
-        source='',
-        message=''
     )
 
     module = AnsibleModule(
@@ -90,12 +93,13 @@ def run_module():
             ["/snap/bin/subutai", "promote", module.params['container']] + args, stderr=subprocess.PIPE).stderr.read()
         if err:
             result['changed'] = False
+            result['stderr'] = err
             module.fail_json(msg='[Err] ' + err, **result)
         result['changed'] = True
 
     else:
         result['changed'] = False
-        result['message'] = "Already promoted"
+        result['stderr'] = "Already promoted"
 
     module.exit_json(**result)
 

@@ -50,9 +50,14 @@ EXAMPLES = '''
 RETURN = '''
 container:
     description: Container affected.
-    type: str
-message:
-    description: The output message that the sample module generates.
+    type: string
+    returned: always
+    sample: "apache"
+stderr:
+    description: Error output from subutai demote
+    type: string
+    returned: success, when need
+    sample: "ERRO[2018-03-09 00:15:56] Container management is not a template"
 '''
 
 import subprocess
@@ -72,9 +77,7 @@ def run_module():
     result = dict(
         changed=False,
         container='',
-        ipaddr='',
-        vlan='',
-        message=''
+        stderr=''
     )
 
     module = AnsibleModule(
@@ -87,8 +90,6 @@ def run_module():
         return result
 
     result['container'] = module.params['container']
-    result['ipaddr'] = module.params['ipaddr']
-    result['vlan'] = module.params['vlan']
 
     args = []
     if module.params['ipaddr']:
@@ -104,12 +105,13 @@ def run_module():
             ["/snap/bin/subutai", "demote", module.params['container']] + args, stderr=subprocess.PIPE).stderr.read()
         if err:
             result['changed'] = False
+            result['stderr'] = err
             module.fail_json(msg='[Err] ' + err, **result)
         result['changed'] = True
 
     else:
         result['changed'] = False
-        result['message'] = "Already demoted"
+        result['stderr'] = "Already demoted"
 
     module.exit_json(**result)
 

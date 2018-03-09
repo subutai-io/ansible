@@ -39,11 +39,16 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-container:
-    description: Container affected.
-    type: str
-message:
-    description: The output message that the sample module generates.
+vlan:
+    description: VLAN affected.
+    type: string
+    returned: always
+    sample: "101"
+stderr:
+    description: Error output from subutai cleanup
+    type: string
+    returned: success, when need
+    sample: "INFO[2018-03-08 23:41:05] 111 not found. Please check if the name is correct"
 '''
 
 import subprocess
@@ -61,7 +66,7 @@ def run_module():
     result = dict(
         changed=False,
         vlan='',
-        message=''
+        stderr=''
     )
 
     module = AnsibleModule(
@@ -79,7 +84,7 @@ def run_module():
     err = subprocess.Popen(
         ["/snap/bin/subutai", "cleanup",  module.params['vlan']], stderr=subprocess.PIPE).stderr.read()
     if err:
-        result['changed'] = False
+        result['stderr'] = err
         module.fail_json(msg='[Err] ' + err, **result)
 
     result['changed'] = True

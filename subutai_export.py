@@ -62,10 +62,15 @@ EXAMPLES = '''
 
 RETURN = '''
 container:
-    description: Container affected
-    type: str
-message:
-    description: The output message that the sample module generates
+    description: Container affected.
+    type: string
+    returned: always
+    sample: "apache"
+stderr:
+    description: Error output from subutai export
+    type: string
+    returned: success, when need
+    sample: "ERRO[2018-03-09 00:23:34] Container apache does not exist"
 '''
 
 import subprocess
@@ -88,11 +93,7 @@ def run_module():
     result = dict(
         changed=False,
         container='',
-        version='',
-        size='',
-        description='',
-        private='',
-        message=''
+        stderr=''
     )
 
     module = AnsibleModule(
@@ -105,11 +106,6 @@ def run_module():
         return result
 
     result['container'] = module.params['container']
-    result['version'] = module.params['version']
-    result['size'] = module.params['size']
-    result['token'] = module.params['token']
-    result['description'] = module.params['description']
-    result['private'] = module.params['private']
 
     args = []
 
@@ -137,6 +133,7 @@ def run_module():
         ["/snap/bin/subutai", "export", module.params['container']] + args, stderr=subprocess.PIPE).stderr.read()
     if err:
         result['changed'] = False
+        result['stderr'] = err
         module.fail_json(msg='[Err] ' + err, **result)
 
     result['changed'] = True

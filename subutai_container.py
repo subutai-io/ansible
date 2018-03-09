@@ -73,9 +73,14 @@ EXAMPLES = '''
 RETURN = '''
 container:
     description: Container affected.
-    type: str
-message:
-    description: The output message that the sample module generates.
+    type: string
+    returned: always
+    sample: "apache"
+stderr:
+    description: Error output from subutai container
+    type: string
+    returned: success, when need
+    sample: "FATA[2018-03-09 00:10:29] Extracting tgz, read /var/snap/subutai/common/lxc/tmpdir/: is a directory"
 '''
 
 import subprocess
@@ -253,7 +258,7 @@ class Container():
         self.module.exit_json(**self.result)
 
     def _return_fail(self, err_msg):
-        self.result['message'] = '[Err] ' + err_msg
+        self.result['stderr'] = err_msg
         self.result['changed'] = False
         self.module.fail_json(msg='[Err] ' + err_msg, **self.result)
 

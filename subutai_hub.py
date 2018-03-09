@@ -97,11 +97,11 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-container:
-    description: Container affected.
-    type: str
-message:
-    description: The output message that the sample module generates.
+stderr:
+    description: Error output from subutai hub
+    type: string
+    returned: success, when need
+    sample: "500 internal server error"
 '''
 
 import subprocess
@@ -114,13 +114,13 @@ def run_module():
 
     # parameters
     module_args = dict(
-        command=dict(type='str', required=True),
+        command=dict(type='str', required=True, choices=['register', 'unregister']),
         console=dict(type='str', required=True),
         console_username=dict(type='str', required=True),
         console_password=dict(type='str', required=True, no_log=True),
         email=dict(type='str', required=False),
         peer_name=dict(type='str', required=False),
-        peer_scope=dict(type='str', required=False),
+        peer_scope=dict(type='str', required=False, choices=['Public', 'Private']),
         hub_password=dict(type='str', required=False, no_log=True),
     )
 
@@ -128,12 +128,6 @@ def run_module():
     result = dict(
         changed=False,
         message='',
-        command='',
-        console='',
-        console_username='',
-        email='',
-        peer_name='',
-        peer_scope='',
     )
 
     module = AnsibleModule(
@@ -146,13 +140,6 @@ def run_module():
         return result
 
     result['command'] = module.params['command']
-    result['console'] = module.params['console']
-    result['console_username'] = module.params['console_username']
-    result['console_password'] = module.params['console_password']
-    result['email'] = module.params['email']
-    result['peer_name'] = module.params['peer_name']
-    result['peer_scope'] = module.params['peer_scope']
-    result['hub_password'] = module.params['hub_password']
 
     # disble annoying SSL warnings
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -167,6 +154,7 @@ def run_module():
             result['changed'] = True
             module.exit_json(**result)
         else:
+            result['stderr'] = result['message']
             result['changed'] = False
             module.fail_json(
                 msg='[Err] {}'.format(result['message']), **result)
@@ -180,6 +168,7 @@ def run_module():
             result['changed'] = True
             module.exit_json(**result)
         else:
+            result['stderr'] = result['message']
             result['changed'] = False
             module.fail_json(
                 msg='[Err] {}'.format(result['message']), **result)

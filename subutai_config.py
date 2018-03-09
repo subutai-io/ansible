@@ -55,10 +55,15 @@ EXAMPLES = '''
 
 RETURN = '''
 container:
-    description: Container affected
-    type: str
-message:
-    description: The output message that the sample module generates
+    description: Container affected.
+    type: string
+    returned: always
+    sample: "apache"
+stderr:
+    description: Error output from subutai config
+    type: string
+    returned: success, when need
+    sample: "FATA[2018-03-08 23:56:02] Reading config, open /var/snap/subutai/common/lxc/apache/config: no such file or directory"
 '''
 
 import subprocess
@@ -79,10 +84,7 @@ def run_module():
     result = dict(
         changed=False,
         container='',
-        operation='',
-        key='',
-        value='',
-        message=''
+        stderr=''
     )
 
     module = AnsibleModule(
@@ -95,9 +97,6 @@ def run_module():
         return result
 
     result['container'] = module.params['container']
-    result['operation'] = module.params['operation']
-    result['key'] = module.params['key']
-    result['value'] = module.params['value']
 
     if module.params['operation'] == "add" and module.params['value'] != "" :
         if key_exist(module.params['container'], module.params['key']):
@@ -108,13 +107,14 @@ def run_module():
             ["/snap/bin/subutai", "config", module.params['container'], "-o", "add",
              "--key",  module.params['key'],  "-v", module.params['value']], stderr=subprocess.PIPE).stderr.read()
         if err:
+            result['stderr'] = err
             module.fail_json(msg='[Err] ' + err, **result)
 
         if key_exist(module.params['container'], module.params['key']):
             result['changed'] = True
         else:
             result['changed'] = False
-            result['message'] = "Key not found " + err
+            result['stderr'] = "Key not found " + err
             module.fail_json(
                 msg='[Err] key ' + module.params['key'] + ' not found', **result)
 
@@ -131,12 +131,12 @@ def run_module():
                                  'operation'] + ' is not a valid operation', **result)
         else:
             result['changed'] = False
-            result['message'] = "Key not found"
+            result['stderr'] = "Key not found"
             module.exit_json(**result)
 
     else:
         result['changed'] = False
-        result['message'] = "Valid operations are: add or del"
+        result['stderr'] = "Valid operations are: add or del"
         module.fail_json(msg='[Err] ' + module.params[
                          'operation'] + ' is not a valid operation', **result)
     

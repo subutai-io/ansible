@@ -103,9 +103,14 @@ EXAMPLES = '''
 RETURN = '''
 container:
     description: Container affected.
-    type: str
-message:
-    description: The output message that the sample module generates.
+    type: string
+    returned: always
+    sample: "apache"
+stderr:
+    description: Error output from subutai proxy
+    type: string
+    returned: success, when need
+    sample: "FATA[2018-03-08 22:09:42] Last backup not found or corrupted. Try make full backup."
 '''
 
 import subprocess
@@ -128,13 +133,6 @@ def run_module():
     # skell to result
     result = dict(
         changed=False,
-        command='',
-        vlan='',
-        domain='',
-        host='',
-        policy='',
-        message='',
-        file='',
     )
 
     module = AnsibleModule(
@@ -145,13 +143,6 @@ def run_module():
     # check mode, don't made any changes
     if module.check_mode:
         return result
-
-    result['command'] = module.params['command']
-    result['vlan'] = module.params['vlan']
-    result['domain'] = module.params['domain']
-    result['host'] = module.params['host']
-    result['policy'] = module.params['policy']
-    result['file'] = module.params['file']
 
     args = []
     check_args = []
@@ -185,6 +176,7 @@ def run_module():
             err = subprocess.Popen(
                 ["/snap/bin/subutai", "proxy", "add", module.params['vlan']] + args, stderr=subprocess.PIPE).stderr.read()
             if err:
+                result['stderr'] = err
                 module.fail_json(msg='[Err] ' + err + str(args), **result)
             else:
                 result['changed'] = True
@@ -194,6 +186,7 @@ def run_module():
         err = subprocess.Popen(
             ["/snap/bin/subutai", "proxy", "del", module.params['vlan']] + check_args, stderr=subprocess.PIPE).stderr.read()
         if err:
+            result['stderr'] = err
             module.fail_json(msg='[Err] ' + err + str(args), **result)
         else:
             result['changed'] = True
