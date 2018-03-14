@@ -21,12 +21,10 @@ options:
     name:
         description:
             - Name of container.
-        required: true
     state:
         description:
         - Indicates the desired container state are installed.
         default: present
-        required: true
         choices: [ absent, demote, promote, present, latest, started, stopped ]
     version:
         description:
@@ -63,31 +61,31 @@ EXAMPLES = '''
 
 - name: run subutai import nginx
     subutai_container:
-    name: 'nginx'
+    name: nginx
     state: present
     become: true
 
 - name: run subutai destroy nginx
     subutai_container:
-    name: 'nginx'
+    name: nginx
     state: absent
     become: true
 
 - name: upgrade nginx
     subutai_container:
-    name: 'nginx'
+    name: nginx
     state: latest
     become: true
 
-# promote template
 - name: promote nginx template
   subutai_container:
+    state: promote
     name: nginx
     
-# demote template
 - name: demote nginx template
   subutai_container:
-    container: nginx
+    name: nginx
+    state: demote
     ipaddr: 192.168.1.1/24
     vlan: foo
 '''
@@ -112,7 +110,7 @@ class Container():
     def __init__(self):
         # parameters
         self.module_args = dict(
-            name=dict(type='str', required=True),
+            name=dict(type='str', required=False),
             source=dict(type='str', required=False),
             version=dict(type='str', required=False),
             token=dict(type='str', required=False),
