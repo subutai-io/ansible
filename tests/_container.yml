@@ -82,3 +82,38 @@
     - name: dump test output
       debug:
         msg: '{{ testout }}'
+
+    - name: promote nginx template
+      subutai_container:
+        name: nginx
+        state: promote
+      become: true
+
+    - name: promote nginx template [2nd run]
+      subutai_container:
+        name: nginx
+        state: promote
+      become: true
+
+    - name: demote nginx template
+      subutai_container:
+        name: nginx
+        state: demote
+        ipaddr: 192.168.1.1/24
+        vlan: foo
+      become: true
+
+    - name: demote nginx template [2nd run]
+      subutai_container:
+        name: nginx
+        state: demote
+        ipaddr: 192.168.1.1/24
+        vlan: foo
+      become: true
+
+    - name: run subutai start nginx
+      subutai_container:
+        name: 'nginx'
+        state: started
+      become: true
+      register: testout

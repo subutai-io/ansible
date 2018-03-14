@@ -27,7 +27,7 @@ options:
         - Indicates the desired container state are installed.
         default: present
         required: true
-        choices: [ absent, present, latest, started, stopped ]
+        choices: [ absent, demote, promote, present, latest, started, stopped ]
     version:
         description:
             - Template version.
@@ -40,6 +40,17 @@ options:
         description:
             - Check for updates without installation.
 
+    source:
+        description:
+            - Set the source for promoting.
+
+    ipaddr:
+        description:
+            - IPv4 address, ie 192.168.1.1/24 
+
+    vlan:
+        description:
+            - VLAN tag.
 
 extends_documentation_fragment:
     - subutai
@@ -68,6 +79,17 @@ EXAMPLES = '''
     state: latest
     become: true
 
+# promote template
+- name: promote nginx template
+  subutai_container:
+    name: nginx
+    
+# demote template
+- name: demote nginx template
+  subutai_container:
+    container: nginx
+    ipaddr: 192.168.1.1/24
+    vlan: foo
 '''
 
 RETURN = '''
@@ -91,10 +113,13 @@ class Container():
         # parameters
         self.module_args = dict(
             name=dict(type='str', required=True),
+            source=dict(type='str', required=False),
             version=dict(type='str', required=False),
             token=dict(type='str', required=False),
             check=dict(type='bool', required=False),
-            state=dict(type='str', default='present', choices=['absent', 'present', 'latest', 'started', 'stopped']),
+            ipaddr=dict(type='str', required=False),
+            vlan=dict(type='str', required=False),
+            state=dict(type='str', default='present', choices=['absent', 'demote', 'present', 'promote', 'latest', 'started', 'stopped']),
         )
 
         self.module = AnsibleModule(
@@ -126,6 +151,12 @@ class Container():
 
         if self.module.params['state'] == 'present':
             self._import()
+
+        if self.module.params['state'] == 'promote':
+            self._promote()
+
+        if self.module.params['state'] == 'demote':
+            self._demote()
 
         if self.module.params['state'] == 'absent':
             self._destroy()
@@ -254,6 +285,50 @@ class Container():
 
         self._exit()
 
+    def _promote(self):
+        if self.module.params['source']:
+            self.args.append("-s")
+            self.args.append(self.module.params['source'])
+
+        if not self._is_promoted():
+            err = subprocess.Popen(
+                ["/snap/bin/subutai", "promote", self.module.params['name']] + self.args, stderr=subprocess.PIPE).stderr.read()
+            if err:
+                self.result['changed'] = False
+                self.result['stderr'] = err
+                self._return_fail(err)
+            self.result['changed'] = True
+
+        else:
+            self.result['changed'] = False
+            self.result['stderr'] = "Already promoted"
+
+        self._exit()
+
+    def _demote(self):
+        if self.module.params['ipaddr']:
+            self.args.append("-i")
+            self.args.append(self.module.params['ipaddr'])
+
+        if self.module.params['vlan']:
+            self.args.append("-v")
+            self.args.append(self.module.params['vlan'])
+
+        if not self._is_demoted():
+            err = subprocess.Popen(
+                ["/snap/bin/subutai", "demote", self.module.params['name']] + self.args, stderr=subprocess.PIPE).stderr.read()
+            if err:
+                self.result['changed'] = False
+                self.result['stderr'] = err
+                self._return_fail(err)
+            self.result['changed'] = True
+
+        else:
+            self.result['changed'] = False
+            self.result['stderr'] = "Already demoted"
+
+        self._exit()
+
     def _exit(self):
         self.module.exit_json(**self.result)
 
@@ -274,6 +349,22 @@ class Container():
         out = subprocess.Popen(
             ["/snap/bin/subutai", "list", "-i", self.module.params['name']], stdout=subprocess.PIPE).stdout.read()
         if bytes("RUNNING") in out:
+            return True
+        else:
+            return False
+
+    def _is_promoted(self):
+        output = subprocess.Popen(
+            ["/snap/bin/subutai", "list", "-t", self.module.params['name']], stdout=subprocess.PIPE).stdout.read()
+        if self.module.params['name'] in output:
+            return True
+        else:
+            return False
+
+    def _is_demoted(self):
+        output = subprocess.Popen(
+            ["/snap/bin/subutai", "list", "-c", self.module.params['name']], stdout=subprocess.PIPE).stdout.read()
+        if self.module.params['name'] in output:
             return True
         else:
             return False
