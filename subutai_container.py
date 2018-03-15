@@ -61,7 +61,34 @@ options:
     globalFlag:
         description:
             - There are two types of channels - local (default), which is created from destination address to host and global from destination to Subutai Helper node.
+    
+    protocol:
+        description:
+            - Specifies required protocol for mapping and might be http, https, tcp or udp.
 
+    internal:
+        description:
+            - Peer's internal socket that should be exposed. Format should be <ip>:<port>
+
+    external:
+        description:
+            - Optional parameter which shows desired RH socket where internal socket should be mapped. If more than one container mapped to one RH port, those containers are being put to the same backend group. Allowed port value must be in range of 1000-65535
+
+    domain:
+        description:
+            - Should be only specified for http and https protocols mapping.
+
+    cert:
+        description:
+            - Path to SSL pem certificate for https protocol.
+
+    policy:
+        description:
+            - Balancing methods (round-robin by default, least_time, hash, ip_hash).
+
+    sslbackend :
+        description:
+            - SSL backend in https upstream.
 
 extends_documentation_fragment:
     - subutai
@@ -127,6 +154,47 @@ EXAMPLES = '''
         network: tunnel
         state: absent
         ipaddr: 10.10.0.20:22
+
+- name: map container's 172.16.31.3 port 3306 to the random port on RH
+    subutai_container:
+    network: map
+    state: present
+    protocol: tcp
+    internal: 172.16.31.3:3306 
+
+- name: add 172.16.31.4:3306 to the same group
+    subutai_container:
+    network: map
+    state: present
+    protocol: tcp
+    internal: 172.16.31.4:3306
+    external: 46558
+
+- name: remove container 172.16.31.3 from mapping
+    subutai_container:
+    network: map
+    state: absent
+    protocol: tcp
+    internal: 172.16.31.3:3306
+    external: 46558
+
+- name: map 172.16.25.12:80 to RH's 8080 with domain name example.com
+    subutai_container:
+    network: map
+    state: present
+    protocol: http
+    internal: 172.16.25.12:80
+    external: 8080
+    domain: example.com
+
+- name: add container to existing example.com domain
+    subutai_container:
+    network: map
+    state: present
+    protocol: http
+    internal: 172.16.25.13:80
+    external: 8080
+    domain: example.com
 '''
 
 RETURN = '''
@@ -150,7 +218,7 @@ class Container():
         # parameters
         self.module_args = dict(
             name=dict(type='str', required=False),
-            network=dict(type='str', choices=['tunnel']),
+            network=dict(type='str', choices=['tunnel', 'map']),
             source=dict(type='str', required=False),
             version=dict(type='str', required=False),
             token=dict(type='str', required=False),
@@ -160,6 +228,13 @@ class Container():
             ttl=dict(type='str', required=False),
             globalFlag=dict(type='bool', required=False),
             state=dict(type='str', default='present', choices=['absent', 'demote', 'present', 'promote', 'latest', 'started', 'stopped']),
+            protocol=dict(type='str', required=False, choices=['http', 'https', 'tcp', 'udp']),
+            internal=dict(type='str', required=False),
+            external=dict(type='str', required=False),
+            domain=dict(type='str', required=False),
+            cert=dict(type='str', required=False),
+            policy=dict(type='str', required=False, choices=['round-robin', 'least_time', 'hash', 'ip_hash']),
+            sslbackend=dict(type='str', required=False),
         )
 
         self.module = AnsibleModule(
@@ -168,6 +243,7 @@ class Container():
             required_one_of=[['name', 'network']],
             required_if=[
                 [ "network", "tunnel", [ "ipaddr" ] ],
+                [ "network", "map", [ "protocol" ] ],
             ]
         )
 
@@ -218,6 +294,9 @@ class Container():
 
         if self.module.params['network'] == 'tunnel':
             self._tunnel()
+
+        if self.module.params['network'] == 'map':
+            self._map()
     
     def _start(self):
         if self._is_running():
@@ -416,6 +495,47 @@ class Container():
 
         else:
             self._return_fail(err)
+
+    def _map(self):
+        self.args.append(self.module.params['protocol'])
+        if self.module.params['internal']:
+            self.args.append("--internal")
+            self.args.append(self.module.params['internal'])
+
+        if self.module.params['external']:
+            self.args.append("--external")
+            self.args.append(self.module.params['external'])
+
+        if self.module.params['domain']:
+            self.args.append("--domain")
+            self.args.append(self.module.params['domain'])
+
+        if self.module.params['cert']:
+            self.args.append("--cert")
+            self.args.append(self.module.params['cert'])
+
+        if self.module.params['policy']:
+            self.args.append("--policy")
+            self.args.append(self.module.params['policy'])
+
+        if self.module.params['sslbackend']:
+            self.args.append("--sslbackend")
+            self.args.append(self.module.params['sslbackend'])
+
+        if self.module.params['state'] == 'absent':
+            self.args.append("--remove")
+
+        err = subprocess.Popen(["/snap/bin/subutai", "map" ,  self.module.params['protocol']] + self.args, stderr=subprocess.PIPE).stderr.read()
+        if err:
+            if "already exists" in err:
+                self.result['changed'] = False
+                self._exit()
+            else:
+                self.result['stderr'] = err
+                self._return_fail(err)
+        else:
+            self.result['changed'] = True
+            self._exit()
 
 
     def _exit(self):
