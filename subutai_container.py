@@ -21,6 +21,10 @@ options:
     name:
         description:
             - Name of container.
+    network:
+        description:
+            - Define network operations, like: Configuring network tunnel for containers in subutai, vxlan tunnels, p2p configurations and network maps.
+        choices: [ tunnel, vxlan, map, p2p ]
     state:
         description:
         - Indicates the desired container state are installed.
@@ -49,6 +53,15 @@ options:
     vlan:
         description:
             - VLAN tag.
+
+    ttl:
+        description:
+            - Tunnels may also be set to be permanent (default) or temporary (ttl in seconds).
+
+    globalFlag:
+        description:
+            - There are two types of channels - local (default), which is created from destination address to host and global from destination to Subutai Helper node.
+
 
 extends_documentation_fragment:
     - subutai
@@ -88,6 +101,32 @@ EXAMPLES = '''
     state: demote
     ipaddr: 192.168.1.1/24
     vlan: foo
+
+- name: subutai tunnel add 10.10.0.20
+    subutai_container:
+        network: tunnel
+        state: present
+        ipaddr: 10.10.0.20
+
+- name: subutai tunnel add 10.10.0.30:8080 300 -g
+    subutai_container:
+        network: tunnel
+        state: present
+        ipaddr: 10.10.0.30:8080
+        ttl: 300
+        globalFlag: true
+
+- name: subutai tunnel del 10.10.0.30:8080
+    subutai_container:
+        network: tunnel
+        state: absent
+        ipaddr: 10.10.0.30:8080
+
+- name: subutai tunnel del 10.10.0.20:8080
+    subutai_container:
+        network: tunnel
+        state: absent
+        ipaddr: 10.10.0.20:22
 '''
 
 RETURN = '''
@@ -111,18 +150,25 @@ class Container():
         # parameters
         self.module_args = dict(
             name=dict(type='str', required=False),
+            network=dict(type='str', choices=['tunnel']),
             source=dict(type='str', required=False),
             version=dict(type='str', required=False),
             token=dict(type='str', required=False),
             check=dict(type='bool', required=False),
             ipaddr=dict(type='str', required=False),
             vlan=dict(type='str', required=False),
+            ttl=dict(type='str', required=False),
+            globalFlag=dict(type='bool', required=False),
             state=dict(type='str', default='present', choices=['absent', 'demote', 'present', 'promote', 'latest', 'started', 'stopped']),
         )
 
         self.module = AnsibleModule(
             argument_spec=self.module_args,
-            supports_check_mode=True
+            supports_check_mode=True,
+            required_one_of=[['name', 'network']],
+            required_if=[
+                [ "network", "tunnel", [ "ipaddr" ] ],
+            ]
         )
 
         # skell to result
@@ -147,27 +193,31 @@ class Container():
             self.args.append("-t")
             self.args.append(self.module.params['token'])
 
-        if self.module.params['state'] == 'present':
-            self._import()
+        if self.module.params['name']:
 
-        if self.module.params['state'] == 'promote':
-            self._promote()
+            if self.module.params['state'] == 'present':
+                self._import()
 
-        if self.module.params['state'] == 'demote':
-            self._demote()
+            if self.module.params['state'] == 'promote':
+                self._promote()
 
-        if self.module.params['state'] == 'absent':
-            self._destroy()
+            if self.module.params['state'] == 'demote':
+                self._demote()
 
-        if self.module.params['state'] == 'latest':
-            self._update()
+            if self.module.params['state'] == 'absent':
+                self._destroy()
 
-        if self.module.params['state'] == 'started':
-            self._start()
+            if self.module.params['state'] == 'latest':
+                self._update()
 
-        if self.module.params['state'] == 'stopped':
-            self._stop()
+            if self.module.params['state'] == 'started':
+                self._start()
 
+            if self.module.params['state'] == 'stopped':
+                self._stop()
+
+        if self.module.params['network'] == 'tunnel':
+            self._tunnel()
     
     def _start(self):
         if self._is_running():
@@ -327,6 +377,47 @@ class Container():
 
         self._exit()
 
+    def _tunnel(self):
+        if self.module.params['ttl']:
+            self.args.append(self.module.params['ttl'])
+
+        if self.module.params['globalFlag']:
+            self.args.append("-g")
+
+        if self.module.params['state'] == "present":
+            if not self._exists_tunnel():
+                err = subprocess.Popen(
+                    ["/snap/bin/subutai", "tunnel", "add", self.module.params['ipaddr']] + self.args, stderr=subprocess.PIPE).stderr.read()
+                if err:
+                    self.result['stderr'] = err
+                    self._return_fail(err)
+                else:
+                    self.result['changed'] = True
+                    self._exit()
+            else:
+                self.result['changed'] = False
+                self.result['stderr'] = "Tunnel already exist"
+                self._exit()
+
+        elif self.module.params['state'] == "absent":
+            if self._exists_tunnel():
+                err = subprocess.Popen(
+                    ["/snap/bin/subutai", "tunnel", "del", self.module.params['ipaddr']], stderr=subprocess.PIPE).stderr.read()
+                if err:
+                    self.result['stderr'] = err
+                    self._return_fail(err)
+                else:
+                    self.result['changed'] = True
+                    self._exit()
+            else:
+                self.result['changed'] = False
+                self.result['stderr'] = "Tunnel do not exist"
+                self._exit()
+
+        else:
+            self._return_fail(err)
+
+
     def _exit(self):
         self.module.exit_json(**self.result)
 
@@ -339,6 +430,14 @@ class Container():
         out = subprocess.Popen(
             ["/snap/bin/subutai", "list"], stdout=subprocess.PIPE).stdout.read()
         if self.module.params['name']+'\n' in out:
+            return True
+        else:
+            return False
+
+    def _exists_tunnel(self):
+        out = subprocess.Popen(
+            ["/snap/bin/subutai", "tunnel", "list"], stdout=subprocess.PIPE).stdout.read()
+        if self.module.params['ipaddr'] in out:
             return True
         else:
             return False

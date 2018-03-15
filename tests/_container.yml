@@ -117,3 +117,53 @@
         state: started
       become: true
       register: testout
+
+    - name: subutai tunnel add 10.10.0.20
+      subutai_container:
+        network: tunnel
+        state: present
+        ipaddr: 10.10.0.20
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: subutai tunnel add 10.10.0.30:8080 300 -g
+      subutai_container:
+        network: tunnel
+        state: present
+        ipaddr: 10.10.0.30:8080
+        ttl: 300
+        globalFlag: true
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: subutai tunnel del 10.10.0.30:8080
+      subutai_container:
+        network: tunnel
+        state: absent
+        ipaddr: 10.10.0.30:8080
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: subutai tunnel del 10.10.0.20:8080
+      subutai_container:
+        network: tunnel
+        state: absent
+        ipaddr: 10.10.0.20:22
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
