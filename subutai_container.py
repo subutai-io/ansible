@@ -102,6 +102,25 @@ options:
         description:
             - VXLAN tunnel VNI.
 
+    interface:
+        description:
+            - Interface name
+
+    hash:
+        description:
+            - hash
+
+    key:
+        description:
+            - key
+
+    localPeepIPAddr:
+        description:
+            - localPeepIPAddr
+
+    portrange :
+        description:
+            - portrange
 
 extends_documentation_fragment:
     - subutai
@@ -224,6 +243,31 @@ EXAMPLES = '''
         state: absent
         vxlan: vxlan1
 
+- name: create p2p instance
+    subutai_container:
+        network: p2p
+        state: present
+        interface: p2p-net1
+        hash: swarm-12345678-abcd-1234-efgh-123456789012
+        key: 0123456789qwertyu0123456789zxcvbn
+        ttl: 1476870551
+        localPeepIPAddr: 10.220.22.1
+        portrange: 0-65535
+
+- name: update p2p instance
+    subutai_container:
+        network: p2p
+        state: present
+        interface: p2p-net1
+        hash: swarm-12345678-abcd-1234-efgh-123456789012
+        key: 0123456789qwertyu0123456789zxcvbn
+        ttl: 1476870551
+
+- name: delete p2p instance
+    subutai_container:
+        network: p2p
+        state: absent
+        hash: swarm-12345678-abcd-1234-efgh-123456789012
 '''
 
 RETURN = '''
@@ -247,7 +291,7 @@ class Container():
         # parameters
         self.module_args = dict(
             name=dict(type='str', required=False),
-            network=dict(type='str', choices=['tunnel', 'map', 'vxlan']),
+            network=dict(type='str', choices=['tunnel', 'map', 'vxlan', 'p2p']),
             source=dict(type='str', required=False),
             version=dict(type='str', required=False),
             token=dict(type='str', required=False),
@@ -266,7 +310,12 @@ class Container():
             sslbackend=dict(type='str', required=False),
             vxlan=dict(type='str', required=False),
             remoteip=dict(type='str', required=False),
-            vni=dict(type='str', required=False)
+            vni=dict(type='str', required=False),
+            interface=dict(type='str', required=False),
+            hash=dict(type='str', required=False),
+            key=dict(type='str', required=False),
+            localPeepIPAddr=dict(type='str', required=False),
+            portrange=dict(type='str', required=False),
 
         )
 
@@ -278,6 +327,7 @@ class Container():
                 [ "network", "tunnel", [ "ipaddr" ] ],
                 [ "network", "map", [ "protocol" ] ],
                 [ "network", "vxlan", ["vxlan" ] ],
+                [ "network", "p2p", ["hash" ] ],
             ]
         )
 
@@ -334,6 +384,9 @@ class Container():
 
         if self.module.params['network'] == 'vxlan':
             self._vxlan()
+
+        if self.module.params['network'] == 'p2p':
+            self._p2p()
     
     def _start(self):
         if self._is_running():
@@ -617,7 +670,43 @@ class Container():
         else:
             self._return_fail(err)
 
-    
+    def _p2p(self):
+                
+        if self.module.params['state'] == "present":
+            self.args.append("-c")
+        elif self.module.params['state'] == "latest":
+            self.args.append("-u")
+        elif self.module.params['state'] == "absent":
+            self.args.append("-d")
+        else:
+            self._return_fail("State valid options are: present, absent and latest")
+
+        if self.module.params['interface']:
+            self.args.append(self.module.params['interface'])
+
+        if self.module.params['hash']:
+            self.args.append(self.module.params['hash'])
+
+        if self.module.params['key']:
+            self.args.append(self.module.params['key'])
+
+        if self.module.params['ttl']:
+            self.args.append(self.module.params['ttl'])
+
+        if self.module.params['localPeepIPAddr']:
+            self.args.append(self.module.params['localPeepIPAddr'])
+
+        if self.module.params['portrange']:
+            self.args.append(self.module.params['portrange'])
+
+        err = subprocess.Popen(["/snap/bin/subutai", "p2p"] + self.args, stderr=subprocess.PIPE).stderr.read()
+        if err:
+                self.result["stderr"] = err
+                self._return_fail(err)
+        else:
+            self.result['changed'] = True
+            self._exit()
+        
     def _exists_vxlan(self):
         return subprocess.Popen(["/snap/bin/subutai", "vxlan", "-l"], stdout=subprocess.PIPE).stdout.read()
 
