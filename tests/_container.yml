@@ -82,3 +82,187 @@
     - name: dump test output
       debug:
         msg: '{{ testout }}'
+
+    - name: promote nginx template
+      subutai_container:
+        name: nginx
+        state: promote
+      become: true
+
+    - name: promote nginx template [2nd run]
+      subutai_container:
+        name: nginx
+        state: promote
+      become: true
+
+    - name: demote nginx template
+      subutai_container:
+        name: nginx
+        state: demote
+        ipaddr: 192.168.1.1/24
+        vlan: foo
+      become: true
+
+    - name: demote nginx template [2nd run]
+      subutai_container:
+        name: nginx
+        state: demote
+        ipaddr: 192.168.1.1/24
+        vlan: foo
+      become: true
+
+    - name: run subutai start nginx
+      subutai_container:
+        name: 'nginx'
+        state: started
+      become: true
+      register: testout
+
+    - name: subutai tunnel add 10.10.0.20
+      subutai_container:
+        network: tunnel
+        state: present
+        ipaddr: 10.10.0.20
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: subutai tunnel add 10.10.0.30:8080 300 -g
+      subutai_container:
+        network: tunnel
+        state: present
+        ipaddr: 10.10.0.30:8080
+        ttl: 300
+        globalFlag: true
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: subutai tunnel del 10.10.0.30:8080
+      subutai_container:
+        network: tunnel
+        state: absent
+        ipaddr: 10.10.0.30:8080
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: subutai tunnel del 10.10.0.20:8080
+      subutai_container:
+        network: tunnel
+        state: absent
+        ipaddr: 10.10.0.20:22
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: map container's 172.16.31.3 port 3306 to the random port on RH
+      subutai_container:
+        network: map
+        state: present
+        protocol: tcp
+        internal: 172.16.31.3:3306 
+
+      become: true
+      register: testout
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: add 172.16.31.4:3306 to the same group
+      subutai_container:
+        network: map
+        state: present
+        protocol: tcp
+        internal: 172.16.31.4:3306
+        external: 46558
+
+      become: true
+      register: testout
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: remove container 172.16.31.3 from mapping
+      subutai_container:
+        network: map
+        state: absent
+        protocol: tcp
+        internal: 172.16.31.3:3306
+        external: 46558
+
+      become: true
+      register: testout
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: map 172.16.25.12:80 to RH's 8080 with domain name example.com
+      subutai_container:
+        network: map
+        state: present
+        protocol: http
+        internal: 172.16.25.12:80
+        external: 8080
+        domain: example.com
+
+      become: true
+      register: testout
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: add container to existing example.com domain
+      subutai_container:
+        network: map
+        state: present
+        protocol: http
+        internal: 172.16.25.13:80
+        external: 8080
+        domain: example.com
+
+      become: true
+      register: testout
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+
+    - name: adding subutai vxlan tunnel
+      subutai_container:
+        network: vxlan
+        state: present
+        vxlan: vxlan1
+        remoteip: 10.220.22.2
+        vlan: 100
+        vni: 12345
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: removing subutai vxlan tunnel
+      subutai_container:
+        network: vxlan
+        state: absent
+        vxlan: vxlan1
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
