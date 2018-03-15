@@ -238,3 +238,31 @@
     - name: dump test output
       debug:
         msg: '{{ testout }}'
+
+
+    - name: adding subutai vxlan tunnel
+      subutai_container:
+        network: vxlan
+        state: present
+        vxlan: vxlan1
+        remoteip: 10.220.22.2
+        vlan: 100
+        vni: 12345
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'
+
+    - name: removing subutai vxlan tunnel
+      subutai_container:
+        network: vxlan
+        state: absent
+        vxlan: vxlan1
+      become: true
+      register: testout
+
+    - name: dump test output
+      debug:
+        msg: '{{ testout }}'

@@ -16,4 +16,3 @@
 - import_playbook: _p2p.yml
 - import_playbook: _proxy.yml
 - import_playbook: _quota.yml
-- import_playbook: _vxlan.yml

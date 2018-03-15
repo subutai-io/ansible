@@ -90,6 +90,19 @@ options:
         description:
             - SSL backend in https upstream.
 
+    vxlan:
+        description:
+            - Vxlan name.
+
+    remoteip:
+        description:
+            - Remote IP address.
+
+    vni:
+        description:
+            - VXLAN tunnel VNI.
+
+
 extends_documentation_fragment:
     - subutai
 
@@ -130,30 +143,30 @@ EXAMPLES = '''
     vlan: foo
 
 - name: subutai tunnel add 10.10.0.20
-    subutai_container:
-        network: tunnel
-        state: present
-        ipaddr: 10.10.0.20
+  subutai_container:
+    network: tunnel
+    state: present
+    ipaddr: 10.10.0.20
 
 - name: subutai tunnel add 10.10.0.30:8080 300 -g
-    subutai_container:
-        network: tunnel
-        state: present
-        ipaddr: 10.10.0.30:8080
-        ttl: 300
-        globalFlag: true
+  subutai_container:
+    network: tunnel
+    state: present
+    ipaddr: 10.10.0.30:8080
+    ttl: 300
+    globalFlag: true
 
 - name: subutai tunnel del 10.10.0.30:8080
-    subutai_container:
-        network: tunnel
-        state: absent
-        ipaddr: 10.10.0.30:8080
+  subutai_container:
+    network: tunnel
+    state: absent
+    ipaddr: 10.10.0.30:8080
 
 - name: subutai tunnel del 10.10.0.20:8080
-    subutai_container:
-        network: tunnel
-        state: absent
-        ipaddr: 10.10.0.20:22
+  subutai_container:
+    network: tunnel
+    state: absent
+    ipaddr: 10.10.0.20:22
 
 - name: map container's 172.16.31.3 port 3306 to the random port on RH
     subutai_container:
@@ -195,6 +208,22 @@ EXAMPLES = '''
     internal: 172.16.25.13:80
     external: 8080
     domain: example.com
+
+- name: adding subutai vxlan tunnel
+    subutai_container:
+        network: vxlan
+        state: present
+        vxlan: vxlan1
+        remoteip: 10.220.22.2
+        vlan: 100
+        vni: 12345
+
+- name: removing subutai vxlan tunnel
+    subutai_container:
+        network: vxlan
+        state: absent
+        vxlan: vxlan1
+
 '''
 
 RETURN = '''
@@ -218,7 +247,7 @@ class Container():
         # parameters
         self.module_args = dict(
             name=dict(type='str', required=False),
-            network=dict(type='str', choices=['tunnel', 'map']),
+            network=dict(type='str', choices=['tunnel', 'map', 'vxlan']),
             source=dict(type='str', required=False),
             version=dict(type='str', required=False),
             token=dict(type='str', required=False),
@@ -235,6 +264,10 @@ class Container():
             cert=dict(type='str', required=False),
             policy=dict(type='str', required=False, choices=['round-robin', 'least_time', 'hash', 'ip_hash']),
             sslbackend=dict(type='str', required=False),
+            vxlan=dict(type='str', required=False),
+            remoteip=dict(type='str', required=False),
+            vni=dict(type='str', required=False)
+
         )
 
         self.module = AnsibleModule(
@@ -244,6 +277,7 @@ class Container():
             required_if=[
                 [ "network", "tunnel", [ "ipaddr" ] ],
                 [ "network", "map", [ "protocol" ] ],
+                [ "network", "vxlan", ["vxlan" ] ],
             ]
         )
 
@@ -297,6 +331,9 @@ class Container():
 
         if self.module.params['network'] == 'map':
             self._map()
+
+        if self.module.params['network'] == 'vxlan':
+            self._vxlan()
     
     def _start(self):
         if self._is_running():
@@ -537,6 +574,52 @@ class Container():
             self.result['changed'] = True
             self._exit()
 
+    def _vxlan(self):
+        
+        if self.module.params['remoteip']:
+            self.args.append("--remoteip")
+            self.args.append(self.module.params['remoteip'])
+
+        if self.module.params['vlan']:
+            self.args.append("--vlan")
+            self.args.append(self.module.params['vlan'])
+
+        if self.module.params['vni']:
+            self.args.append("--vni")
+            self.args.append(self.module.params['vni'])
+
+        if self.module.params['state'] == "present":
+            err = subprocess.Popen(
+                ["/snap/bin/subutai", "vxlan", "--create", self.module.params['vxlan']] + self.args, stderr=subprocess.PIPE).stderr.read()
+            if err:
+                self.result['stderr'] = err
+                self._return_fail(err)
+            else:
+                if self.module.params['vxlan'] in self._exists_vxlan():
+                    self.result['changed'] = True
+                    self._exit()
+                else:
+                    self._return_fail(err)
+
+        elif self.module.params['state'] == "absent":
+            err = subprocess.Popen(
+                ["/snap/bin/subutai", "vxlan", "--delete", self.module.params['vxlan']], stderr=subprocess.PIPE).stderr.read()
+            if err:
+                self.result['stderr'] = err
+                self._return_fail(err)
+            else:
+                if self.module.params['vxlan'] not in self._exists_vxlan():
+                    self.result['changed'] = True
+                    self._exit()
+                else:
+                    self._return_fail(err)
+
+        else:
+            self._return_fail(err)
+
+    
+    def _exists_vxlan(self):
+        return subprocess.Popen(["/snap/bin/subutai", "vxlan", "-l"], stdout=subprocess.PIPE).stdout.read()
 
     def _exit(self):
         self.module.exit_json(**self.result)
