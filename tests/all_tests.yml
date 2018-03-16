@@ -13,5 +13,4 @@
 - import_playbook: _hostname.yml
 - import_playbook: _hub.yml
 - import_playbook: _container.yml
-- import_playbook: _proxy.yml
 - import_playbook: _quota.yml

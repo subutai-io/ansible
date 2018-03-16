@@ -82,7 +82,7 @@ options:
         description:
             - Path to SSL pem certificate for https protocol.
 
-    policy:
+    map_policy:
         description:
             - Balancing methods (round-robin by default, least_time, hash, ip_hash).
 
@@ -121,6 +121,19 @@ options:
     portrange :
         description:
             - portrange
+
+    host:
+        description:
+            - Add host to domain on VLAN.
+
+    proxy_policy:
+        description:
+            - Set load balance policy (rr|lb|hash).
+
+    file:
+        description:
+            - Pem certificate file.
+
 
 extends_documentation_fragment:
     - subutai
@@ -268,6 +281,34 @@ EXAMPLES = '''
         network: p2p
         state: absent
         hash: swarm-12345678-abcd-1234-efgh-123456789012
+
+- name: add domain example.com to 100 vlan
+    subutai_container:
+        network: proxy
+        state: present
+        vlan: 100
+        domain: example.com
+
+- name: add domain example.com to 100 vlan
+    subutai_container:
+        network: proxy
+        state: present
+        vlan: 100
+        host: 10.10.0.20
+
+- name: delete domain example.com
+    subutai_container:
+        conetwork: proxy
+        state: absent
+        vlan: 100
+        domain: example.com
+
+- name: delete host 10.10.0.20
+    subutai_container:
+        conetwork: proxy
+        state: absent
+        vlan: 100
+        host: 10.10.0.20
 '''
 
 RETURN = '''
@@ -291,7 +332,7 @@ class Container():
         # parameters
         self.module_args = dict(
             name=dict(type='str', required=False),
-            network=dict(type='str', choices=['tunnel', 'map', 'vxlan', 'p2p']),
+            network=dict(type='str', choices=['tunnel', 'map', 'vxlan', 'p2p', 'proxy']),
             source=dict(type='str', required=False),
             version=dict(type='str', required=False),
             token=dict(type='str', required=False),
@@ -306,7 +347,8 @@ class Container():
             external=dict(type='str', required=False),
             domain=dict(type='str', required=False),
             cert=dict(type='str', required=False),
-            policy=dict(type='str', required=False, choices=['round-robin', 'least_time', 'hash', 'ip_hash']),
+            map_policy=dict(type='str', required=False, choices=['round-robin', 'least_time', 'hash', 'ip_hash']),
+            proxy_policy=dict(type='str', required=False, choices=['lb', 'rr', 'hash']),
             sslbackend=dict(type='str', required=False),
             vxlan=dict(type='str', required=False),
             remoteip=dict(type='str', required=False),
@@ -316,6 +358,8 @@ class Container():
             key=dict(type='str', required=False),
             localPeepIPAddr=dict(type='str', required=False),
             portrange=dict(type='str', required=False),
+            host=dict(type='str', required=False),
+            file=dict(type='str', required=False),
 
         )
 
@@ -387,7 +431,10 @@ class Container():
 
         if self.module.params['network'] == 'p2p':
             self._p2p()
-    
+
+        if self.module.params['network'] == 'proxy':
+            self._proxy()
+            
     def _start(self):
         if self._is_running():
             self.result['changed'] = False
@@ -604,9 +651,9 @@ class Container():
             self.args.append("--cert")
             self.args.append(self.module.params['cert'])
 
-        if self.module.params['policy']:
+        if self.module.params['map_policy']:
             self.args.append("--policy")
-            self.args.append(self.module.params['policy'])
+            self.args.append(self.module.params['map_policy'])
 
         if self.module.params['sslbackend']:
             self.args.append("--sslbackend")
@@ -706,7 +753,58 @@ class Container():
         else:
             self.result['changed'] = True
             self._exit()
-        
+
+    def _proxy(self):
+        check_args = []
+        if self.module.params['domain']:
+            self.args.append("--domain")
+            self.args.append(self.module.params['domain'])
+            check_args.append("-d")
+
+        if self.module.params['host']:
+            self.args.append("--host")
+            self.args.append(self.module.params['host'])
+            check_args.append("-h")
+            check_args.append(self.module.params['host'])
+
+        if self.module.params['proxy_policy']:
+            self.args.append("--policy")
+            self.args.append(self.module.params['proxy_policy'])
+
+        if self.module.params['file']:
+            self.args.append("--file")
+            self.args.append(self.module.params['file'])
+
+        if self.module.params['state'] == "present":
+            out = subprocess.Popen(
+                ["/snap/bin/subutai", "proxy", "check", self.module.params['vlan']] + check_args, stdout=subprocess.PIPE).stdout.read()
+            if out:
+                self.result['changed'] = False
+                self._exit()
+            else:
+                err = subprocess.Popen(
+                    ["/snap/bin/subutai", "proxy", "add", self.module.params['vlan']] + self.args, stderr=subprocess.PIPE).stderr.read()
+                if err:
+                    self.result['stderr'] = err
+                    self._return_fail(err)
+                else:
+                    self.result['changed'] = True
+                    self._exit()
+
+        elif self.module.params['state'] == "absent":
+            err = subprocess.Popen(
+                ["/snap/bin/subutai", "proxy", "del", self.module.params['vlan']] + check_args, stderr=subprocess.PIPE).stderr.read()
+            if err:
+                self.result['stderr'] = err
+                self._return_fail(err)
+            else:
+                self.result['changed'] = True
+                self.result['message'] = str(self.args)
+                self._exit()
+        else:
+            self._return_fail(err)
+
+    
     def _exists_vxlan(self):
         return subprocess.Popen(["/snap/bin/subutai", "vxlan", "-l"], stdout=subprocess.PIPE).stdout.read()
 
