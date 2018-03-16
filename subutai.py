@@ -327,12 +327,14 @@ stderr:
 import subprocess
 from ansible.module_utils.basic import AnsibleModule
 
+
 class Container():
     def __init__(self):
         # parameters
         self.module_args = dict(
             name=dict(type='str', required=False),
-            network=dict(type='str', choices=['tunnel', 'map', 'vxlan', 'p2p', 'proxy']),
+            network=dict(type='str', choices=[
+                         'tunnel', 'map', 'vxlan', 'p2p', 'proxy']),
             source=dict(type='str', required=False),
             version=dict(type='str', required=False),
             token=dict(type='str', required=False),
@@ -341,14 +343,18 @@ class Container():
             vlan=dict(type='str', required=False),
             ttl=dict(type='str', required=False),
             globalFlag=dict(type='bool', required=False),
-            state=dict(type='str', default='present', choices=['absent', 'demote', 'present', 'promote', 'latest', 'started', 'stopped']),
-            protocol=dict(type='str', required=False, choices=['http', 'https', 'tcp', 'udp']),
+            state=dict(type='str', default='present', choices=[
+                       'absent', 'demote', 'present', 'promote', 'latest', 'started', 'stopped']),
+            protocol=dict(type='str', required=False, choices=[
+                          'http', 'https', 'tcp', 'udp']),
             internal=dict(type='str', required=False),
             external=dict(type='str', required=False),
             domain=dict(type='str', required=False),
             cert=dict(type='str', required=False),
-            map_policy=dict(type='str', required=False, choices=['round-robin', 'least_time', 'hash', 'ip_hash']),
-            proxy_policy=dict(type='str', required=False, choices=['lb', 'rr', 'hash']),
+            map_policy=dict(type='str', required=False, choices=[
+                            'round-robin', 'least_time', 'hash', 'ip_hash']),
+            proxy_policy=dict(type='str', required=False,
+                              choices=['lb', 'rr', 'hash']),
             sslbackend=dict(type='str', required=False),
             vxlan=dict(type='str', required=False),
             remoteip=dict(type='str', required=False),
@@ -368,10 +374,10 @@ class Container():
             supports_check_mode=True,
             required_one_of=[['name', 'network']],
             required_if=[
-                [ "network", "tunnel", [ "ipaddr" ] ],
-                [ "network", "map", [ "protocol" ] ],
-                [ "network", "vxlan", ["vxlan" ] ],
-                [ "network", "p2p", ["hash" ] ],
+                ["network", "tunnel", ["ipaddr"]],
+                ["network", "map", ["protocol"]],
+                ["network", "vxlan", ["vxlan"]],
+                ["network", "p2p", ["hash"]],
             ]
         )
 
@@ -388,7 +394,7 @@ class Container():
 
         if self.module.params['check']:
             self.args.append("-c")
-        
+
         if self.module.params['version']:
             self.args.append("-v")
             self.args.append(self.module.params['version'])
@@ -434,7 +440,7 @@ class Container():
 
         if self.module.params['network'] == 'proxy':
             self._proxy()
-            
+
     def _start(self):
         if self._is_running():
             self.result['changed'] = False
@@ -467,7 +473,7 @@ class Container():
 
             if self._is_running():
                 self.result['changed'] = True
-            
+
         self._exit()
 
     def _stop(self):
@@ -501,7 +507,7 @@ class Container():
 
             if not self._is_running():
                 self.result['changed'] = True
-            
+
         self._exit()
 
     def _update(self):
@@ -532,8 +538,8 @@ class Container():
             if self._subutai_cmd("destroy"):
                 self._return_fail("Destroy Error")
             self.result['changed'] = True
-            self._exit()        
-    
+            self._exit()
+
     def _import(self):
         # verify if container is already installed
         if self._is_installed():
@@ -543,7 +549,7 @@ class Container():
             # try install container
             if self._subutai_cmd("import"):
                 self._return_fail("Import Error")
-            
+
             if self._is_installed():
                 self.result['changed'] = True
 
@@ -662,7 +668,8 @@ class Container():
         if self.module.params['state'] == 'absent':
             self.args.append("--remove")
 
-        err = subprocess.Popen(["/snap/bin/subutai", "map" ,  self.module.params['protocol']] + self.args, stderr=subprocess.PIPE).stderr.read()
+        err = subprocess.Popen(["/snap/bin/subutai", "map",  self.module.params['protocol']
+                                ] + self.args, stderr=subprocess.PIPE).stderr.read()
         if err:
             if "already exists" in err:
                 self.result['changed'] = False
@@ -675,7 +682,7 @@ class Container():
             self._exit()
 
     def _vxlan(self):
-        
+
         if self.module.params['remoteip']:
             self.args.append("--remoteip")
             self.args.append(self.module.params['remoteip'])
@@ -718,7 +725,7 @@ class Container():
             self._return_fail(err)
 
     def _p2p(self):
-                
+
         if self.module.params['state'] == "present":
             self.args.append("-c")
         elif self.module.params['state'] == "latest":
@@ -726,7 +733,8 @@ class Container():
         elif self.module.params['state'] == "absent":
             self.args.append("-d")
         else:
-            self._return_fail("State valid options are: present, absent and latest")
+            self._return_fail(
+                "State valid options are: present, absent and latest")
 
         if self.module.params['interface']:
             self.args.append(self.module.params['interface'])
@@ -746,10 +754,11 @@ class Container():
         if self.module.params['portrange']:
             self.args.append(self.module.params['portrange'])
 
-        err = subprocess.Popen(["/snap/bin/subutai", "p2p"] + self.args, stderr=subprocess.PIPE).stderr.read()
+        err = subprocess.Popen(
+            ["/snap/bin/subutai", "p2p"] + self.args, stderr=subprocess.PIPE).stderr.read()
         if err:
-                self.result["stderr"] = err
-                self._return_fail(err)
+            self.result["stderr"] = err
+            self._return_fail(err)
         else:
             self.result['changed'] = True
             self._exit()
@@ -804,7 +813,6 @@ class Container():
         else:
             self._return_fail(err)
 
-    
     def _exists_vxlan(self):
         return subprocess.Popen(["/snap/bin/subutai", "vxlan", "-l"], stdout=subprocess.PIPE).stdout.read()
 
@@ -861,8 +869,10 @@ class Container():
             ["/snap/bin/subutai", cmd, self.module.params['name']] + self.args, stderr=subprocess.PIPE).stderr.read()
         return err_msg
 
+
 def main():
     Container()
+
 
 if __name__ == '__main__':
     main()
