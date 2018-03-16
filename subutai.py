@@ -8,7 +8,7 @@ ANSIBLE_METADATA = {
 
 DOCUMENTATION = '''
 ---
-module: subutai_container
+module: subutai
 
 short_description: subutai container module
 
@@ -145,43 +145,43 @@ author:
 EXAMPLES = '''
 
 - name: run subutai import nginx
-    subutai_container:
+    subutai:
     name: nginx
     state: present
     become: true
 
 - name: run subutai destroy nginx
-    subutai_container:
+    subutai:
     name: nginx
     state: absent
     become: true
 
 - name: upgrade nginx
-    subutai_container:
+    subutai:
     name: nginx
     state: latest
     become: true
 
 - name: promote nginx template
-  subutai_container:
+  subutai:
     state: promote
     name: nginx
     
 - name: demote nginx template
-  subutai_container:
+  subutai:
     name: nginx
     state: demote
     ipaddr: 192.168.1.1/24
     vlan: foo
 
 - name: subutai tunnel add 10.10.0.20
-  subutai_container:
+  subutai:
     network: tunnel
     state: present
     ipaddr: 10.10.0.20
 
 - name: subutai tunnel add 10.10.0.30:8080 300 -g
-  subutai_container:
+  subutai:
     network: tunnel
     state: present
     ipaddr: 10.10.0.30:8080
@@ -189,26 +189,26 @@ EXAMPLES = '''
     globalFlag: true
 
 - name: subutai tunnel del 10.10.0.30:8080
-  subutai_container:
+  subutai:
     network: tunnel
     state: absent
     ipaddr: 10.10.0.30:8080
 
 - name: subutai tunnel del 10.10.0.20:8080
-  subutai_container:
+  subutai:
     network: tunnel
     state: absent
     ipaddr: 10.10.0.20:22
 
 - name: map container's 172.16.31.3 port 3306 to the random port on RH
-    subutai_container:
+    subutai:
     network: map
     state: present
     protocol: tcp
     internal: 172.16.31.3:3306 
 
 - name: add 172.16.31.4:3306 to the same group
-    subutai_container:
+    subutai:
     network: map
     state: present
     protocol: tcp
@@ -216,7 +216,7 @@ EXAMPLES = '''
     external: 46558
 
 - name: remove container 172.16.31.3 from mapping
-    subutai_container:
+    subutai:
     network: map
     state: absent
     protocol: tcp
@@ -224,7 +224,7 @@ EXAMPLES = '''
     external: 46558
 
 - name: map 172.16.25.12:80 to RH's 8080 with domain name example.com
-    subutai_container:
+    subutai:
     network: map
     state: present
     protocol: http
@@ -233,7 +233,7 @@ EXAMPLES = '''
     domain: example.com
 
 - name: add container to existing example.com domain
-    subutai_container:
+    subutai:
     network: map
     state: present
     protocol: http
@@ -242,7 +242,7 @@ EXAMPLES = '''
     domain: example.com
 
 - name: adding subutai vxlan tunnel
-    subutai_container:
+    subutai:
         network: vxlan
         state: present
         vxlan: vxlan1
@@ -251,13 +251,13 @@ EXAMPLES = '''
         vni: 12345
 
 - name: removing subutai vxlan tunnel
-    subutai_container:
+    subutai:
         network: vxlan
         state: absent
         vxlan: vxlan1
 
 - name: create p2p instance
-    subutai_container:
+    subutai:
         network: p2p
         state: present
         interface: p2p-net1
@@ -268,7 +268,7 @@ EXAMPLES = '''
         portrange: 0-65535
 
 - name: update p2p instance
-    subutai_container:
+    subutai:
         network: p2p
         state: present
         interface: p2p-net1
@@ -277,34 +277,34 @@ EXAMPLES = '''
         ttl: 1476870551
 
 - name: delete p2p instance
-    subutai_container:
+    subutai:
         network: p2p
         state: absent
         hash: swarm-12345678-abcd-1234-efgh-123456789012
 
 - name: add domain example.com to 100 vlan
-    subutai_container:
+    subutai:
         network: proxy
         state: present
         vlan: 100
         domain: example.com
 
 - name: add domain example.com to 100 vlan
-    subutai_container:
+    subutai:
         network: proxy
         state: present
         vlan: 100
         host: 10.10.0.20
 
 - name: delete domain example.com
-    subutai_container:
+    subutai:
         conetwork: proxy
         state: absent
         vlan: 100
         domain: example.com
 
 - name: delete host 10.10.0.20
-    subutai_container:
+    subutai:
         conetwork: proxy
         state: absent
         vlan: 100
