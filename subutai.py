@@ -8,7 +8,7 @@ ANSIBLE_METADATA = {
 
 DOCUMENTATION = '''
 ---
-module: subutai_container
+module: subutai
 
 short_description: subutai container module
 
@@ -82,7 +82,7 @@ options:
         description:
             - Path to SSL pem certificate for https protocol.
 
-    policy:
+    map_policy:
         description:
             - Balancing methods (round-robin by default, least_time, hash, ip_hash).
 
@@ -102,6 +102,38 @@ options:
         description:
             - VXLAN tunnel VNI.
 
+    interface:
+        description:
+            - Interface name
+
+    hash:
+        description:
+            - hash
+
+    key:
+        description:
+            - key
+
+    localPeepIPAddr:
+        description:
+            - localPeepIPAddr
+
+    portrange :
+        description:
+            - portrange
+
+    host:
+        description:
+            - Add host to domain on VLAN.
+
+    proxy_policy:
+        description:
+            - Set load balance policy (rr|lb|hash).
+
+    file:
+        description:
+            - Pem certificate file.
+
 
 extends_documentation_fragment:
     - subutai
@@ -113,43 +145,43 @@ author:
 EXAMPLES = '''
 
 - name: run subutai import nginx
-    subutai_container:
+    subutai:
     name: nginx
     state: present
     become: true
 
 - name: run subutai destroy nginx
-    subutai_container:
+    subutai:
     name: nginx
     state: absent
     become: true
 
 - name: upgrade nginx
-    subutai_container:
+    subutai:
     name: nginx
     state: latest
     become: true
 
 - name: promote nginx template
-  subutai_container:
+  subutai:
     state: promote
     name: nginx
     
 - name: demote nginx template
-  subutai_container:
+  subutai:
     name: nginx
     state: demote
     ipaddr: 192.168.1.1/24
     vlan: foo
 
 - name: subutai tunnel add 10.10.0.20
-  subutai_container:
+  subutai:
     network: tunnel
     state: present
     ipaddr: 10.10.0.20
 
 - name: subutai tunnel add 10.10.0.30:8080 300 -g
-  subutai_container:
+  subutai:
     network: tunnel
     state: present
     ipaddr: 10.10.0.30:8080
@@ -157,26 +189,26 @@ EXAMPLES = '''
     globalFlag: true
 
 - name: subutai tunnel del 10.10.0.30:8080
-  subutai_container:
+  subutai:
     network: tunnel
     state: absent
     ipaddr: 10.10.0.30:8080
 
 - name: subutai tunnel del 10.10.0.20:8080
-  subutai_container:
+  subutai:
     network: tunnel
     state: absent
     ipaddr: 10.10.0.20:22
 
 - name: map container's 172.16.31.3 port 3306 to the random port on RH
-    subutai_container:
+    subutai:
     network: map
     state: present
     protocol: tcp
     internal: 172.16.31.3:3306 
 
 - name: add 172.16.31.4:3306 to the same group
-    subutai_container:
+    subutai:
     network: map
     state: present
     protocol: tcp
@@ -184,7 +216,7 @@ EXAMPLES = '''
     external: 46558
 
 - name: remove container 172.16.31.3 from mapping
-    subutai_container:
+    subutai:
     network: map
     state: absent
     protocol: tcp
@@ -192,7 +224,7 @@ EXAMPLES = '''
     external: 46558
 
 - name: map 172.16.25.12:80 to RH's 8080 with domain name example.com
-    subutai_container:
+    subutai:
     network: map
     state: present
     protocol: http
@@ -201,7 +233,7 @@ EXAMPLES = '''
     domain: example.com
 
 - name: add container to existing example.com domain
-    subutai_container:
+    subutai:
     network: map
     state: present
     protocol: http
@@ -210,7 +242,7 @@ EXAMPLES = '''
     domain: example.com
 
 - name: adding subutai vxlan tunnel
-    subutai_container:
+    subutai:
         network: vxlan
         state: present
         vxlan: vxlan1
@@ -219,11 +251,64 @@ EXAMPLES = '''
         vni: 12345
 
 - name: removing subutai vxlan tunnel
-    subutai_container:
+    subutai:
         network: vxlan
         state: absent
         vxlan: vxlan1
 
+- name: create p2p instance
+    subutai:
+        network: p2p
+        state: present
+        interface: p2p-net1
+        hash: swarm-12345678-abcd-1234-efgh-123456789012
+        key: 0123456789qwertyu0123456789zxcvbn
+        ttl: 1476870551
+        localPeepIPAddr: 10.220.22.1
+        portrange: 0-65535
+
+- name: update p2p instance
+    subutai:
+        network: p2p
+        state: present
+        interface: p2p-net1
+        hash: swarm-12345678-abcd-1234-efgh-123456789012
+        key: 0123456789qwertyu0123456789zxcvbn
+        ttl: 1476870551
+
+- name: delete p2p instance
+    subutai:
+        network: p2p
+        state: absent
+        hash: swarm-12345678-abcd-1234-efgh-123456789012
+
+- name: add domain example.com to 100 vlan
+    subutai:
+        network: proxy
+        state: present
+        vlan: 100
+        domain: example.com
+
+- name: add domain example.com to 100 vlan
+    subutai:
+        network: proxy
+        state: present
+        vlan: 100
+        host: 10.10.0.20
+
+- name: delete domain example.com
+    subutai:
+        conetwork: proxy
+        state: absent
+        vlan: 100
+        domain: example.com
+
+- name: delete host 10.10.0.20
+    subutai:
+        conetwork: proxy
+        state: absent
+        vlan: 100
+        host: 10.10.0.20
 '''
 
 RETURN = '''
@@ -242,12 +327,14 @@ stderr:
 import subprocess
 from ansible.module_utils.basic import AnsibleModule
 
+
 class Container():
     def __init__(self):
         # parameters
         self.module_args = dict(
             name=dict(type='str', required=False),
-            network=dict(type='str', choices=['tunnel', 'map', 'vxlan']),
+            network=dict(type='str', choices=[
+                         'tunnel', 'map', 'vxlan', 'p2p', 'proxy']),
             source=dict(type='str', required=False),
             version=dict(type='str', required=False),
             token=dict(type='str', required=False),
@@ -256,17 +343,29 @@ class Container():
             vlan=dict(type='str', required=False),
             ttl=dict(type='str', required=False),
             globalFlag=dict(type='bool', required=False),
-            state=dict(type='str', default='present', choices=['absent', 'demote', 'present', 'promote', 'latest', 'started', 'stopped']),
-            protocol=dict(type='str', required=False, choices=['http', 'https', 'tcp', 'udp']),
+            state=dict(type='str', default='present', choices=[
+                       'absent', 'demote', 'present', 'promote', 'latest', 'started', 'stopped']),
+            protocol=dict(type='str', required=False, choices=[
+                          'http', 'https', 'tcp', 'udp']),
             internal=dict(type='str', required=False),
             external=dict(type='str', required=False),
             domain=dict(type='str', required=False),
             cert=dict(type='str', required=False),
-            policy=dict(type='str', required=False, choices=['round-robin', 'least_time', 'hash', 'ip_hash']),
+            map_policy=dict(type='str', required=False, choices=[
+                            'round-robin', 'least_time', 'hash', 'ip_hash']),
+            proxy_policy=dict(type='str', required=False,
+                              choices=['lb', 'rr', 'hash']),
             sslbackend=dict(type='str', required=False),
             vxlan=dict(type='str', required=False),
             remoteip=dict(type='str', required=False),
-            vni=dict(type='str', required=False)
+            vni=dict(type='str', required=False),
+            interface=dict(type='str', required=False),
+            hash=dict(type='str', required=False),
+            key=dict(type='str', required=False),
+            localPeepIPAddr=dict(type='str', required=False),
+            portrange=dict(type='str', required=False),
+            host=dict(type='str', required=False),
+            file=dict(type='str', required=False),
 
         )
 
@@ -275,9 +374,10 @@ class Container():
             supports_check_mode=True,
             required_one_of=[['name', 'network']],
             required_if=[
-                [ "network", "tunnel", [ "ipaddr" ] ],
-                [ "network", "map", [ "protocol" ] ],
-                [ "network", "vxlan", ["vxlan" ] ],
+                ["network", "tunnel", ["ipaddr"]],
+                ["network", "map", ["protocol"]],
+                ["network", "vxlan", ["vxlan"]],
+                ["network", "p2p", ["hash"]],
             ]
         )
 
@@ -294,7 +394,7 @@ class Container():
 
         if self.module.params['check']:
             self.args.append("-c")
-        
+
         if self.module.params['version']:
             self.args.append("-v")
             self.args.append(self.module.params['version'])
@@ -334,7 +434,13 @@ class Container():
 
         if self.module.params['network'] == 'vxlan':
             self._vxlan()
-    
+
+        if self.module.params['network'] == 'p2p':
+            self._p2p()
+
+        if self.module.params['network'] == 'proxy':
+            self._proxy()
+
     def _start(self):
         if self._is_running():
             self.result['changed'] = False
@@ -367,7 +473,7 @@ class Container():
 
             if self._is_running():
                 self.result['changed'] = True
-            
+
         self._exit()
 
     def _stop(self):
@@ -401,7 +507,7 @@ class Container():
 
             if not self._is_running():
                 self.result['changed'] = True
-            
+
         self._exit()
 
     def _update(self):
@@ -432,8 +538,8 @@ class Container():
             if self._subutai_cmd("destroy"):
                 self._return_fail("Destroy Error")
             self.result['changed'] = True
-            self._exit()        
-    
+            self._exit()
+
     def _import(self):
         # verify if container is already installed
         if self._is_installed():
@@ -443,7 +549,7 @@ class Container():
             # try install container
             if self._subutai_cmd("import"):
                 self._return_fail("Import Error")
-            
+
             if self._is_installed():
                 self.result['changed'] = True
 
@@ -551,9 +657,9 @@ class Container():
             self.args.append("--cert")
             self.args.append(self.module.params['cert'])
 
-        if self.module.params['policy']:
+        if self.module.params['map_policy']:
             self.args.append("--policy")
-            self.args.append(self.module.params['policy'])
+            self.args.append(self.module.params['map_policy'])
 
         if self.module.params['sslbackend']:
             self.args.append("--sslbackend")
@@ -562,7 +668,8 @@ class Container():
         if self.module.params['state'] == 'absent':
             self.args.append("--remove")
 
-        err = subprocess.Popen(["/snap/bin/subutai", "map" ,  self.module.params['protocol']] + self.args, stderr=subprocess.PIPE).stderr.read()
+        err = subprocess.Popen(["/snap/bin/subutai", "map",  self.module.params['protocol']
+                                ] + self.args, stderr=subprocess.PIPE).stderr.read()
         if err:
             if "already exists" in err:
                 self.result['changed'] = False
@@ -575,7 +682,7 @@ class Container():
             self._exit()
 
     def _vxlan(self):
-        
+
         if self.module.params['remoteip']:
             self.args.append("--remoteip")
             self.args.append(self.module.params['remoteip'])
@@ -617,7 +724,95 @@ class Container():
         else:
             self._return_fail(err)
 
-    
+    def _p2p(self):
+
+        if self.module.params['state'] == "present":
+            self.args.append("-c")
+        elif self.module.params['state'] == "latest":
+            self.args.append("-u")
+        elif self.module.params['state'] == "absent":
+            self.args.append("-d")
+        else:
+            self._return_fail(
+                "State valid options are: present, absent and latest")
+
+        if self.module.params['interface']:
+            self.args.append(self.module.params['interface'])
+
+        if self.module.params['hash']:
+            self.args.append(self.module.params['hash'])
+
+        if self.module.params['key']:
+            self.args.append(self.module.params['key'])
+
+        if self.module.params['ttl']:
+            self.args.append(self.module.params['ttl'])
+
+        if self.module.params['localPeepIPAddr']:
+            self.args.append(self.module.params['localPeepIPAddr'])
+
+        if self.module.params['portrange']:
+            self.args.append(self.module.params['portrange'])
+
+        err = subprocess.Popen(
+            ["/snap/bin/subutai", "p2p"] + self.args, stderr=subprocess.PIPE).stderr.read()
+        if err:
+            self.result["stderr"] = err
+            self._return_fail(err)
+        else:
+            self.result['changed'] = True
+            self._exit()
+
+    def _proxy(self):
+        check_args = []
+        if self.module.params['domain']:
+            self.args.append("--domain")
+            self.args.append(self.module.params['domain'])
+            check_args.append("-d")
+
+        if self.module.params['host']:
+            self.args.append("--host")
+            self.args.append(self.module.params['host'])
+            check_args.append("-h")
+            check_args.append(self.module.params['host'])
+
+        if self.module.params['proxy_policy']:
+            self.args.append("--policy")
+            self.args.append(self.module.params['proxy_policy'])
+
+        if self.module.params['file']:
+            self.args.append("--file")
+            self.args.append(self.module.params['file'])
+
+        if self.module.params['state'] == "present":
+            out = subprocess.Popen(
+                ["/snap/bin/subutai", "proxy", "check", self.module.params['vlan']] + check_args, stdout=subprocess.PIPE).stdout.read()
+            if out:
+                self.result['changed'] = False
+                self._exit()
+            else:
+                err = subprocess.Popen(
+                    ["/snap/bin/subutai", "proxy", "add", self.module.params['vlan']] + self.args, stderr=subprocess.PIPE).stderr.read()
+                if err:
+                    self.result['stderr'] = err
+                    self._return_fail(err)
+                else:
+                    self.result['changed'] = True
+                    self._exit()
+
+        elif self.module.params['state'] == "absent":
+            err = subprocess.Popen(
+                ["/snap/bin/subutai", "proxy", "del", self.module.params['vlan']] + check_args, stderr=subprocess.PIPE).stderr.read()
+            if err:
+                self.result['stderr'] = err
+                self._return_fail(err)
+            else:
+                self.result['changed'] = True
+                self.result['message'] = str(self.args)
+                self._exit()
+        else:
+            self._return_fail(err)
+
     def _exists_vxlan(self):
         return subprocess.Popen(["/snap/bin/subutai", "vxlan", "-l"], stdout=subprocess.PIPE).stdout.read()
 
@@ -674,8 +869,10 @@ class Container():
             ["/snap/bin/subutai", cmd, self.module.params['name']] + self.args, stderr=subprocess.PIPE).stderr.read()
         return err_msg
 
+
 def main():
     Container()
+
 
 if __name__ == '__main__':
     main()
