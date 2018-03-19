@@ -1,4 +1,12 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+# Copyright 2018 Fernando H R Silva <liquuid@gmail.com>
+#
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+from __future__ import absolute_import, division, print_function
+__metaclass__ = type
 
 ANSIBLE_METADATA = {
     'metadata_version': '1.0',
@@ -9,137 +17,108 @@ ANSIBLE_METADATA = {
 DOCUMENTATION = '''
 ---
 module: subutai
-
-short_description: subutai container module
-
-version_added: "2.6"
-
+short_description:
+    - Subutai container module. This modules manage all life cicle of subutai containers.
 description:
     - This modules manage all life cicle of subutai containers.
-
+version_added: "2.6"
 options:
-    name:
-        description:
-            - Name of container.
-    network:
-        description:
-            - Define network operations, like: Configuring network tunnel for containers in subutai, vxlan tunnels, p2p configurations and network maps.
-        choices: [ tunnel, vxlan, map, p2p ]
-    state:
-        description:
-        - Indicates the desired container state are installed.
-        default: present
-        choices: [ absent, demote, promote, present, latest, started, stopped ]
-    version:
-        description:
-            - Template version.
-
-    token:
-        description:
-            - Token to access private repo.
-
-    check:
-        description:
-            - Check for updates without installation.
-
-    source:
-        description:
-            - Set the source for promoting.
-
-    ipaddr:
-        description:
-            - IPv4 address, ie 192.168.1.1/24 
-
-    vlan:
-        description:
-            - VLAN tag.
-
-    ttl:
-        description:
-            - Tunnels may also be set to be permanent (default) or temporary (ttl in seconds).
-
-    globalFlag:
-        description:
-            - There are two types of channels - local (default), which is created from destination address to host and global from destination to Subutai Helper node.
-    
-    protocol:
-        description:
-            - Specifies required protocol for mapping and might be http, https, tcp or udp.
-
-    internal:
-        description:
-            - Peer's internal socket that should be exposed. Format should be <ip>:<port>
-
-    external:
-        description:
-            - Optional parameter which shows desired RH socket where internal socket should be mapped. If more than one container mapped to one RH port, those containers are being put to the same backend group. Allowed port value must be in range of 1000-65535
-
-    domain:
-        description:
-            - Should be only specified for http and https protocols mapping.
-
-    cert:
-        description:
-            - Path to SSL pem certificate for https protocol.
-
-    map_policy:
-        description:
-            - Balancing methods (round-robin by default, least_time, hash, ip_hash).
-
-    sslbackend :
-        description:
-            - SSL backend in https upstream.
-
-    vxlan:
-        description:
-            - Vxlan name.
-
-    remoteip:
-        description:
-            - Remote IP address.
-
-    vni:
-        description:
-            - VXLAN tunnel VNI.
-
-    interface:
-        description:
-            - Interface name
-
-    hash:
-        description:
-            - hash
-
-    key:
-        description:
-            - key
-
-    localPeepIPAddr:
-        description:
-            - localPeepIPAddr
-
-    portrange :
-        description:
-            - portrange
-
-    host:
-        description:
-            - Add host to domain on VLAN.
-
-    proxy_policy:
-        description:
-            - Set load balance policy (rr|lb|hash).
-
-    file:
-        description:
-            - Pem certificate file.
-
-
-extends_documentation_fragment:
-    - subutai
+  name:
+    description:
+      - Name of container.
+  network:
+    description:
+      - Define network operations, like  Configuring network tunnel for containers in subutai, vxlan tunnels, p2p configurations and network maps.
+    default: 'present'
+    choices: [ 'tunnel', 'vxlan', 'map', 'p2p' ]
+  state:
+    description:
+      - Indicates the desired container state are installed.
+    default: 'present'
+    choices: [ 'absent', 'demote', 'promote', 'present', 'latest', 'started', 'stopped' ]
+  version:
+    description:
+      - Template version.
+  token:
+    description:
+      - Token to access private repo.
+  check:
+    description:
+      - Check for updates without installation.
+  source:
+    description:
+      - Set the source for promoting.
+  ipaddr:
+    description:
+      - IPv4 address, ie 192.168.1.1/24
+  vlan:
+    description:
+      - VLAN tag.
+  ttl:
+    description:
+      - Tunnels may also be set to be permanent or temporary (ttl in seconds).
+  globalFlag:
+    description:
+      - There are two types of channels - local, which is created from destination address to host and global from destination to Subutai Helper node.
+  protocol:
+    description:
+      - Specifies required protocol for mapping and might be http, https, tcp or udp.
+  internal:
+    description:
+      - Peer's internal socket that should be exposed. Format should be <ip>/<port>
+  external:
+    description:
+      - Optional parameter which shows desired RH socket where internal socket should be mapped.
+        If more than one container mapped to one RH port, those containers are being put to the same backend group.
+        Allowed port value must be in range of 1000-65535
+  domain:
+    description:
+      - Should be only specified for http and https protocols mapping.
+  cert:
+    description:
+      - Path to SSL pem certificate for https protocol.
+  map_policy:
+    description:
+      - Balancing methods (round-robin by default, least_time, hash, ip_hash).
+  sslbackend :
+    description:
+      - SSL backend in https upstream.
+  vxlan:
+    description:
+      - Vxlan name.
+  remoteip:
+    description:
+      - Remote IP address.
+  vni:
+    description:
+      - VXLAN tunnel VNI.
+  interface:
+    description:
+      - Interface name
+  hash:
+    description:
+      - hash
+  key:
+    description:
+      - key
+  localPeepIPAddr:
+    description:
+      - localPeepIPAddr
+  portrange :
+    description:
+      - portrange
+  host:
+    description:
+      - Add host to domain on VLAN.
+  proxy_policy:
+    description:
+      - Set load balance policy (rr|lb|hash).
+  file:
+    description:
+      - Pem certificate file.
 
 author:
-    - Fernando Silva (@liquuid)
+  - "Fernando Silva (@liquuid)"
 '''
 
 EXAMPLES = '''
@@ -166,7 +145,7 @@ EXAMPLES = '''
   subutai:
     state: promote
     name: nginx
-    
+
 - name: demote nginx template
   subutai:
     name: nginx
@@ -205,7 +184,7 @@ EXAMPLES = '''
     network: map
     state: present
     protocol: tcp
-    internal: 172.16.31.3:3306 
+    internal: 172.16.31.3:3306
 
 - name: add 172.16.31.4:3306 to the same group
     subutai:
@@ -668,7 +647,7 @@ class Container():
         if self.module.params['state'] == 'absent':
             self.args.append("--remove")
 
-        err = subprocess.Popen(["/snap/bin/subutai", "map",  self.module.params['protocol']
+        err = subprocess.Popen(["/snap/bin/subutai", "map", self.module.params['protocol']
                                 ] + self.args, stderr=subprocess.PIPE).stderr.read()
         if err:
             if "already exists" in err:
@@ -827,7 +806,7 @@ class Container():
     def _is_installed(self):
         out = subprocess.Popen(
             ["/snap/bin/subutai", "list"], stdout=subprocess.PIPE).stdout.read()
-        if self.module.params['name']+'\n' in out:
+        if self.module.params['name'] + '\n' in out:
             return True
         else:
             return False
