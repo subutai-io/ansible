@@ -36,12 +36,6 @@ options:
       - Indicates the desired container state are installed.
     default: 'present'
     choices: [ 'absent', 'demote', 'promote', 'present', 'latest', 'started', 'stopped' ]
-  version:
-    description:
-      - Template version.
-  token:
-    description:
-      - Token to access private repo.
   check:
     description:
       - Check for updates without installation.
@@ -315,8 +309,6 @@ class Container():
             network=dict(type='str', choices=[
                          'tunnel', 'map', 'vxlan', 'p2p', 'proxy']),
             source=dict(type='str', required=False),
-            version=dict(type='str', required=False),
-            token=dict(type='str', required=False),
             check=dict(type='bool', required=False),
             ipaddr=dict(type='str', required=False),
             vlan=dict(type='str', required=False),
@@ -373,14 +365,6 @@ class Container():
 
         if self.module.params['check']:
             self.args.append("-c")
-
-        if self.module.params['version']:
-            self.args.append("-v")
-            self.args.append(self.module.params['version'])
-
-        if self.module.params['token']:
-            self.args.append("-t")
-            self.args.append(self.module.params['token'])
 
         if self.module.params['name']:
 
