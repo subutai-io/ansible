@@ -8,6 +8,8 @@ Inside this module directory, run:
 
 `ansible-playbook --module-path . tests/all_tests.yml -i ./hosts`
 
+Replace `tests/all_tests.yml` with path to your recipe/playbook.
+
 You'll need create a `hosts` file describing which servers this script will run, for example to run on localhost on port 2222: 
 
 `localhost:2222`
