@@ -70,6 +70,6 @@ class Module():
 
 if __name__ == '__main__':
     m = Module()
-    for mod in glob.glob("subutai_*py"):
+    for mod in glob.glob("subutai*py"):
         m.gen_markdown(mod.replace(".py", ""))
         print("{}...".format(mod))
