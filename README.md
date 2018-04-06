@@ -17,3 +17,5 @@ You'll need create a `hosts` file describing which servers this script will run,
 To generate Markdown documentation run:
 
 `./docgen.py`
+
+Online documentation for subutai module can be found in: https://github.com/subutai-io/ansible/wiki/subutai
