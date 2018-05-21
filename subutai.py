@@ -325,7 +325,7 @@ stderr:
     description: Error output from subutai container
     type: string
     returned: success, when need
-    sample: "FATA[2018-03-09 00:10:29] Extracting tgz, read /var/snap/subutai/common/lxc/tmpdir/: is a directory"
+    sample: "FATA[2018-03-09 00:10:29] Extracting tgz, read /var/lib/lxc: is a directory"
 '''
 
 import subprocess
