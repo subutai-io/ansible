@@ -557,7 +557,7 @@ class Container():
         if not self._is_promoted():
             try:
                 err = subprocess.Popen(
-                    ["/snap/bin/subutai", "promote", self.module.params['name']] + self.args, stderr=subprocess.PIPE).stderr.read()
+                    ["/usr/bin/subutai", "promote", self.module.params['name']] + self.args, stderr=subprocess.PIPE).stderr.read()
                 if err:
                     self.result['changed'] = False
                     self.result['stderr'] = err
@@ -587,7 +587,7 @@ class Container():
         if not self._is_demoted():
             try:
                 err = subprocess.Popen(
-                    ["/snap/bin/subutai", "demote", self.module.params['name']] + self.args, stderr=subprocess.PIPE).stderr.read()
+                    ["/usr/bin/subutai", "demote", self.module.params['name']] + self.args, stderr=subprocess.PIPE).stderr.read()
                 if err:
                     self.result['changed'] = False
                     self.result['stderr'] = err
@@ -614,7 +614,7 @@ class Container():
             if not self._exists_tunnel():
                 try:
                     err = subprocess.Popen(
-                        ["/snap/bin/subutai", "tunnel", "add", self.module.params['ipaddr']] + self.args, stderr=subprocess.PIPE).stderr.read()
+                        ["/usr/bin/subutai", "tunnel", "add", self.module.params['ipaddr']] + self.args, stderr=subprocess.PIPE).stderr.read()
                     if err:
                         self.result['stderr'] = err
                         self._return_fail(err)
@@ -634,7 +634,7 @@ class Container():
             if self._exists_tunnel():
                 try:
                     err = subprocess.Popen(
-                        ["/snap/bin/subutai", "tunnel", "del", self.module.params['ipaddr']], stderr=subprocess.PIPE).stderr.read()
+                        ["/usr/bin/subutai", "tunnel", "del", self.module.params['ipaddr']], stderr=subprocess.PIPE).stderr.read()
                     if err:
                         self.result['stderr'] = err
                         self._return_fail(err)
@@ -682,7 +682,7 @@ class Container():
         if self.module.params['state'] == 'absent':
             self.args.append("--remove")
         try:
-            err = subprocess.Popen(["/snap/bin/subutai", "map", self.module.params['protocol']
+            err = subprocess.Popen(["/usr/bin/subutai", "map", self.module.params['protocol']
                                     ] + self.args, stderr=subprocess.PIPE).stderr.read()
             if err:
                 if "already exists" in err:
@@ -716,7 +716,7 @@ class Container():
         if self.module.params['state'] == "present":
             try:
                 err = subprocess.Popen(
-                    ["/snap/bin/subutai", "vxlan", "--create", self.module.params['vxlan']] + self.args, stderr=subprocess.PIPE).stderr.read()
+                    ["/usr/bin/subutai", "vxlan", "--create", self.module.params['vxlan']] + self.args, stderr=subprocess.PIPE).stderr.read()
                 if err:
                     self.result['stderr'] = err
                     self._return_fail(err)
@@ -734,7 +734,7 @@ class Container():
         elif self.module.params['state'] == "absent":
             try:
                 err = subprocess.Popen(
-                    ["/snap/bin/subutai", "vxlan", "--delete", self.module.params['vxlan']], stderr=subprocess.PIPE).stderr.read()
+                    ["/usr/bin/subutai", "vxlan", "--delete", self.module.params['vxlan']], stderr=subprocess.PIPE).stderr.read()
                 if err:
                     self.result['stderr'] = err
                     self._return_fail(err)
@@ -782,7 +782,7 @@ class Container():
             self.args.append(self.module.params['portrange'])
         try:
             err = subprocess.Popen(
-                ["/snap/bin/subutai", "p2p"] + self.args, stderr=subprocess.PIPE).stderr.read()
+                ["/usr/bin/subutai", "p2p"] + self.args, stderr=subprocess.PIPE).stderr.read()
             if err:
                 self.result["stderr"] = err
                 self._return_fail(err)
@@ -818,13 +818,13 @@ class Container():
         if self.module.params['state'] == "present":
             try:
                 out = subprocess.Popen(
-                    ["/snap/bin/subutai", "proxy", "check", self.module.params['vlan']] + check_args, stdout=subprocess.PIPE).stdout.read()
+                    ["/usr/bin/subutai", "proxy", "check", self.module.params['vlan']] + check_args, stdout=subprocess.PIPE).stdout.read()
                 if out:
                     self.result['changed'] = False
                     self._exit()
                 else:
                     err = subprocess.Popen(
-                        ["/snap/bin/subutai", "proxy", "add", self.module.params['vlan']] + self.args, stderr=subprocess.PIPE).stderr.read()
+                        ["/usr/bin/subutai", "proxy", "add", self.module.params['vlan']] + self.args, stderr=subprocess.PIPE).stderr.read()
                     if err:
                         self.result['stderr'] = err
                         self._return_fail(err)
@@ -839,7 +839,7 @@ class Container():
         elif self.module.params['state'] == "absent":
             try:
                 err = subprocess.Popen(
-                    ["/snap/bin/subutai", "proxy", "del", self.module.params['vlan']] + check_args, stderr=subprocess.PIPE).stderr.read()
+                    ["/usr/bin/subutai", "proxy", "del", self.module.params['vlan']] + check_args, stderr=subprocess.PIPE).stderr.read()
                 if err:
                     self.result['stderr'] = err
                     self._return_fail(err)
@@ -856,7 +856,7 @@ class Container():
 
     def _exists_vxlan(self):
         try:
-            return subprocess.Popen(["/snap/bin/subutai", "vxlan", "-l"], stdout=subprocess.PIPE).stdout.read()
+            return subprocess.Popen(["/usr/bin/subutai", "vxlan", "-l"], stdout=subprocess.PIPE).stdout.read()
         except OSError as e:
             if "[Errno 2] No such file or directory" in str(e):
                 self.result['changed'] = False
@@ -873,7 +873,7 @@ class Container():
     def _is_installed(self):
         try:
             out = subprocess.Popen(
-                ["/snap/bin/subutai", "list"], stdout=subprocess.PIPE).stdout.read()
+                ["/usr/bin/subutai", "list"], stdout=subprocess.PIPE).stdout.read()
             if self.module.params['name'] + '\n' in out:
                 return True
             else:
@@ -886,7 +886,7 @@ class Container():
     def _exists_tunnel(self):
         try:
             out = subprocess.Popen(
-                ["/snap/bin/subutai", "tunnel", "list"], stdout=subprocess.PIPE).stdout.read()
+                ["/usr/bin/subutai", "tunnel", "list"], stdout=subprocess.PIPE).stdout.read()
             if self.module.params['ipaddr'] in out:
                 return True
             else:
@@ -899,7 +899,7 @@ class Container():
     def _is_running(self):
         try:
             out = subprocess.Popen(
-                ["/snap/bin/subutai", "list", "-i", self.module.params['name']], stdout=subprocess.PIPE).stdout.read()
+                ["/usr/bin/subutai", "list", "-i", self.module.params['name']], stdout=subprocess.PIPE).stdout.read()
             if bytes("RUNNING") in out:
                 return True
             else:
@@ -912,7 +912,7 @@ class Container():
     def _is_promoted(self):
         try:
             output = subprocess.Popen(
-                ["/snap/bin/subutai", "list", "-t", self.module.params['name']], stdout=subprocess.PIPE).stdout.read()
+                ["/usr/bin/subutai", "list", "-t", self.module.params['name']], stdout=subprocess.PIPE).stdout.read()
             if self.module.params['name'] in output:
                 return True
             else:
@@ -925,7 +925,7 @@ class Container():
     def _is_demoted(self):
         try:
             output = subprocess.Popen(
-                ["/snap/bin/subutai", "list", "-c", self.module.params['name']], stdout=subprocess.PIPE).stdout.read()
+                ["/usr/bin/subutai", "list", "-c", self.module.params['name']], stdout=subprocess.PIPE).stdout.read()
             if self.module.params['name'] in output:
                 return True
             else:
@@ -938,7 +938,7 @@ class Container():
     def _subutai_cmd(self, cmd):
         try:
             msg = subprocess.Popen(
-                ["/snap/bin/subutai", cmd, self.module.params['name']] + self.args, stderr=subprocess.PIPE).stderr.read()
+                ["/usr/bin/subutai", cmd, self.module.params['name']] + self.args, stderr=subprocess.PIPE).stderr.read()
             return msg
         except OSError as e:
             if "[Errno 2] No such file or directory" in str(e):
