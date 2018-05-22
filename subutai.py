@@ -566,6 +566,9 @@ class Container():
                 if "[Errno 2] No such file or directory" in str(e):
                     self.result['changed'] = False
                     self._return_fail("Subutai is not installed")
+                else:
+                    self.result['changed'] = False
+                    self._return_fail("OS Error " + str(e))
 
             self.result['changed'] = True
 
@@ -597,6 +600,9 @@ class Container():
                 if "[Errno 2] No such file or directory" in str(e):
                     self.result['changed'] = False
                     self._return_fail("Subutai is not installed")
+                else:
+                    self.result['changed'] = False
+                    self._return_fail("OS Error " + str(e))
         else:
             self.result['changed'] = False
             self.result['stderr'] = "Already demoted"
@@ -625,6 +631,9 @@ class Container():
                     if "[Errno 2] No such file or directory" in str(e):
                         self.result['changed'] = False
                         self._return_fail("Subutai is not installed")
+                    else:
+                        self.result['changed'] = False
+                        self._return_fail("OS Error " + str(e))
             else:
                 self.result['changed'] = False
                 self.result['stderr'] = "Tunnel already exist"
@@ -645,6 +654,9 @@ class Container():
                     if "[Errno 2] No such file or directory" in str(e):
                         self.result['changed'] = False
                         self._return_fail("Subutai is not installed")
+                    else:
+                        self.result['changed'] = False
+                        self._return_fail("OS Error " + str(e))
             else:
                 self.result['changed'] = False
                 self.result['stderr'] = "Tunnel do not exist"
@@ -698,6 +710,9 @@ class Container():
             if "[Errno 2] No such file or directory" in str(e):
                 self.result['changed'] = False
                 self._return_fail("Subutai is not installed")
+            else:
+                self.result['changed'] = False
+                self._return_fail("OS Error " + str(e))
 
     def _vxlan(self):
 
@@ -730,6 +745,9 @@ class Container():
                 if "[Errno 2] No such file or directory" in str(e):
                     self.result['changed'] = False
                     self._return_fail("Subutai is not installed")
+                else:
+                    self.result['changed'] = False
+                    self._return_fail("OS Error " + str(e))
 
         elif self.module.params['state'] == "absent":
             try:
@@ -748,6 +766,9 @@ class Container():
                 if "[Errno 2] No such file or directory" in str(e):
                     self.result['changed'] = False
                     self._return_fail("Subutai is not installed")
+                else:
+                    self.result['changed'] = False
+                    self._return_fail("OS Error " + str(e))
         else:
             self._return_fail(err)
 
@@ -793,6 +814,9 @@ class Container():
             if "[Errno 2] No such file or directory" in str(e):
                 self.result['changed'] = False
                 self._return_fail("Subutai is not installed")
+            else:
+                self.result['changed'] = False
+                self._return_fail("OS Error " + str(e))
 
     def _proxy(self):
         check_args = []
@@ -835,6 +859,9 @@ class Container():
                 if "[Errno 2] No such file or directory" in str(e):
                     self.result['changed'] = False
                     self._return_fail("Subutai is not installed")
+                else:
+                    self.result['changed'] = False
+                    self._return_fail("OS Error " + str(e))
 
         elif self.module.params['state'] == "absent":
             try:
@@ -851,6 +878,9 @@ class Container():
                 if "[Errno 2] No such file or directory" in str(e):
                     self.result['changed'] = False
                     self._return_fail("Subutai is not installed")
+                else:
+                    self.result['changed'] = False
+                    self._return_fail("OS Error " + str(e))
         else:
             self._return_fail(err)
 
@@ -861,6 +891,9 @@ class Container():
             if "[Errno 2] No such file or directory" in str(e):
                 self.result['changed'] = False
                 self._return_fail("Subutai is not installed")
+            else:
+                self.result['changed'] = False
+                self._return_fail("OS Error " + str(e))
 
     def _exit(self):
         self.module.exit_json(**self.result)
@@ -882,6 +915,9 @@ class Container():
             if "[Errno 2] No such file or directory" in str(e):
                 self.result['changed'] = False
                 self._return_fail("Subutai is not installed")
+            else:
+                self.result['changed'] = False
+                self._return_fail("OS Error " + str(e))
 
     def _exists_tunnel(self):
         try:
@@ -895,6 +931,9 @@ class Container():
             if "[Errno 2] No such file or directory" in str(e):
                 self.result['changed'] = False
                 self._return_fail("Subutai is not installed")
+            else:
+                self.result['changed'] = False
+                self._return_fail("OS Error " + str(e))
 
     def _is_running(self):
         try:
@@ -908,6 +947,9 @@ class Container():
             if "[Errno 2] No such file or directory" in str(e):
                 self.result['changed'] = False
                 self._return_fail("Subutai is not installed")
+            else:
+                self.result['changed'] = False
+                self._return_fail("OS Error " + str(e))
 
     def _is_promoted(self):
         try:
@@ -921,6 +963,9 @@ class Container():
             if "[Errno 2] No such file or directory" in str(e):
                 self.result['changed'] = False
                 self._return_fail("Subutai is not installed")
+            else:
+                self.result['changed'] = False
+                self._return_fail("OS Error " + str(e))
 
     def _is_demoted(self):
         try:
@@ -934,6 +979,9 @@ class Container():
             if "[Errno 2] No such file or directory" in str(e):
                 self.result['changed'] = False
                 self._return_fail("Subutai is not installed")
+            else:
+                self.result['changed'] = False
+                self._return_fail("OS Error " + str(e))
 
     def _subutai_cmd(self, cmd):
         try:
@@ -944,6 +992,10 @@ class Container():
             if "[Errno 2] No such file or directory" in str(e):
                 self.result['changed'] = False
                 self._return_fail("Subutai is not installed")
+            else:
+                self.result['changed'] = False
+                self._return_fail("OS Error " + str(e))
+
 
 
 def main():
