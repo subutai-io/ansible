@@ -61,7 +61,7 @@ options:
     description:
       - Indicates the desired container state are installed.
     default: 'present'
-    choices: [ 'absent', 'demote', 'promote', 'present', 'latest', 'started', 'stopped' ]
+    choices: [ 'absent', 'present', 'latest', 'started', 'stopped' ]
   check:
     description:
       - Check for updates without installation.
@@ -165,18 +165,6 @@ EXAMPLES = '''
     name: nginx
     state: latest
     become: true
-
-- name: promote nginx template
-  subutai:
-    state: promote
-    name: nginx
-
-- name: demote nginx template
-  subutai:
-    name: nginx
-    state: demote
-    ipaddr: 192.168.1.1/24
-    vlan: foo
 
 - name: subutai tunnel add 10.10.0.20
   subutai:
@@ -346,7 +334,7 @@ class Container():
             ttl=dict(type='str', required=False),
             globalFlag=dict(type='bool', required=False),
             state=dict(type='str', default='present', choices=[
-                       'absent', 'demote', 'present', 'promote', 'latest', 'started', 'stopped']),
+                       'absent', 'present', 'latest', 'started', 'stopped']),
             protocol=dict(type='str', required=False, choices=[
                           'http', 'https', 'tcp', 'udp']),
             internal=dict(type='str', required=False),
@@ -402,12 +390,6 @@ class Container():
             if self.module.params['state'] == 'present':
                 self._import()
 
-            if self.module.params['state'] == 'promote':
-                self._promote()
-
-            if self.module.params['state'] == 'demote':
-                self._demote()
-
             if self.module.params['state'] == 'absent':
                 self._destroy()
 
@@ -447,9 +429,6 @@ class Container():
 
             self._subutai_cmd("import")
 
-            # try demote container
-            self._subutai_cmd("demote")
-
             # try start container
             if self._subutai_cmd("start"):
                 self._return_fail("Start Error")
@@ -458,8 +437,6 @@ class Container():
                 self.result['changed'] = True
 
         else:
-            # try demote container
-            self._subutai_cmd("demote")
 
             # try start container
             if self._subutai_cmd("start"):
@@ -478,9 +455,6 @@ class Container():
 
             self._subutai_cmd("import")
 
-            # try demote container
-            self._subutai_cmd("demote")
-
             # try stop container
             if self._subutai_cmd("stop"):
                 self._return_fail("Stop Error")
@@ -492,8 +466,6 @@ class Container():
             if not self._is_running():
                 self.result['changed'] = False
                 self._exit()
-            # try demote container
-            self._subutai_cmd("demote")
 
             # try start container
             if self._subutai_cmd("stop"):
@@ -513,7 +485,6 @@ class Container():
             self._exit()
 
         else:
-            self._subutai_cmd("demote")
             if self._subutai_cmd("start"):
                 self._return_fail("Start Error")
 
@@ -546,66 +517,6 @@ class Container():
 
             if self._is_installed():
                 self.result['changed'] = True
-
-        self._exit()
-
-    def _promote(self):
-        if self.module.params['source']:
-            self.args.append("-s")
-            self.args.append(self.module.params['source'])
-
-        if not self._is_promoted():
-            try:
-                err = subprocess.Popen(
-                    ["/usr/bin/subutai", "promote", self.module.params['name']] + self.args, stderr=subprocess.PIPE).stderr.read()
-                if err:
-                    self.result['changed'] = False
-                    self.result['stderr'] = err
-                    self._return_fail(err)
-            except OSError as e:
-                if "[Errno 2] No such file or directory" in str(e):
-                    self.result['changed'] = False
-                    self._return_fail("Subutai is not installed")
-                else:
-                    self.result['changed'] = False
-                    self._return_fail("OS Error " + str(e))
-
-            self.result['changed'] = True
-
-        else:
-            self.result['changed'] = False
-            self.result['stderr'] = "Already promoted"
-
-        self._exit()
-
-    def _demote(self):
-        if self.module.params['ipaddr']:
-            self.args.append("-i")
-            self.args.append(self.module.params['ipaddr'])
-
-        if self.module.params['vlan']:
-            self.args.append("-v")
-            self.args.append(self.module.params['vlan'])
-
-        if not self._is_demoted():
-            try:
-                err = subprocess.Popen(
-                    ["/usr/bin/subutai", "demote", self.module.params['name']] + self.args, stderr=subprocess.PIPE).stderr.read()
-                if err:
-                    self.result['changed'] = False
-                    self.result['stderr'] = err
-                    self._return_fail(err)
-                self.result['changed'] = True
-            except OSError as e:
-                if "[Errno 2] No such file or directory" in str(e):
-                    self.result['changed'] = False
-                    self._return_fail("Subutai is not installed")
-                else:
-                    self.result['changed'] = False
-                    self._return_fail("OS Error " + str(e))
-        else:
-            self.result['changed'] = False
-            self.result['stderr'] = "Already demoted"
 
         self._exit()
 
@@ -940,38 +851,6 @@ class Container():
             out = subprocess.Popen(
                 ["/usr/bin/subutai", "list", "-i", self.module.params['name']], stdout=subprocess.PIPE).stdout.read()
             if bytes("RUNNING") in out:
-                return True
-            else:
-                return False
-        except OSError as e:
-            if "[Errno 2] No such file or directory" in str(e):
-                self.result['changed'] = False
-                self._return_fail("Subutai is not installed")
-            else:
-                self.result['changed'] = False
-                self._return_fail("OS Error " + str(e))
-
-    def _is_promoted(self):
-        try:
-            output = subprocess.Popen(
-                ["/usr/bin/subutai", "list", "-t", self.module.params['name']], stdout=subprocess.PIPE).stdout.read()
-            if self.module.params['name'] in output:
-                return True
-            else:
-                return False
-        except OSError as e:
-            if "[Errno 2] No such file or directory" in str(e):
-                self.result['changed'] = False
-                self._return_fail("Subutai is not installed")
-            else:
-                self.result['changed'] = False
-                self._return_fail("OS Error " + str(e))
-
-    def _is_demoted(self):
-        try:
-            output = subprocess.Popen(
-                ["/usr/bin/subutai", "list", "-c", self.module.params['name']], stdout=subprocess.PIPE).stdout.read()
-            if self.module.params['name'] in output:
                 return True
             else:
                 return False
