@@ -158,6 +158,12 @@ EXAMPLES = '''
     name: nginx
     state: absent
 
+- name: run subutai destroy template nginx
+  subutai:
+    name: nginx
+    state: absent
+    template: true
+
 - name: upgrade nginx
   subutai:
     name: nginx
@@ -322,6 +328,7 @@ class Container():
         # parameters
         self.module_args = dict(
             name=dict(type='str', required=False),
+            template=dict(type='bool', required=False),
             network=dict(type='str', choices=[
                          'tunnel', 'map', 'vxlan', 'p2p', 'proxy']),
             source=dict(type='str', required=False),
@@ -388,6 +395,8 @@ class Container():
                 self._import()
 
             if self.module.params['state'] == 'absent':
+                if self.module.params['template']:
+                    self.args.append("-t")
                 self._destroy()
 
             if self.module.params['state'] == 'latest':
@@ -497,8 +506,9 @@ class Container():
             self._exit()
         else:
             # try destroy container
-            if self._subutai_cmd("destroy"):
-                self._return_fail("Destroy Error")
+            out = self._subutai_cmd("destroy")
+            if out:
+                self._return_fail("Destroy Error: " + str(out))
             self.result['changed'] = True
             self._exit()
 
