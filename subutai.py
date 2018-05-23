@@ -152,19 +152,16 @@ EXAMPLES = '''
   subutai:
     name: nginx
     state: present
-    become: true
 
 - name: run subutai destroy nginx
   subutai:
     name: nginx
     state: absent
-    become: true
 
 - name: upgrade nginx
   subutai:
     name: nginx
     state: latest
-    become: true
 
 - name: subutai tunnel add 10.10.0.20
   subutai:
