@@ -512,8 +512,9 @@ class Container():
             self.result['message'] = 'already installed'
         else:
             # try install container
-            if self._subutai_cmd("import"):
-                self._return_fail("Import Error")
+            out = self._subutai_cmd("import")
+            if out:
+                self._return_fail("Import Error: "  + str(out))
 
             if self._is_installed():
                 self.result['changed'] = True
