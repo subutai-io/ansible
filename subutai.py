@@ -30,18 +30,12 @@ options:
   network:
     description:
       - Define network operations, like  Configuring network tunnel for containers in subutai, vxlan tunnels,
-        p2p configurations and network maps.
+        and network maps.
 
         Subutai VXLAN is network layer built on top of P2P swarms and intended to be environment communication
         bridges between physically separate hosts. Each Subutai environment has its own separate VXLAN tunnel
         so all internal network traffic goes through isolated channels, doesn't matter if environment located
         on single peer or distributed between multiple peers.
-
-        Subutai's p2p command controls and configures the peer-to-peer network structure. The swarm which
-        includes all hosts with same the same swarm hash and secret key. P2P is a base layer for Subutai
-        environment networking. All containers in same environment are connected to each other via VXLAN tunnels
-        and are accesses as if they were in one LAN. It doesn't matter where the containers are physically
-        located.
 
         The tunnel feature is based on SSH tunnels and works in combination with Subutai Helpers and serves as
         an easy solution for bypassing NATs. In Subutai, tunnels are used to access the SS management server's
@@ -56,7 +50,7 @@ options:
         will have different "entrance" address.
 
     default: 'present'
-    choices: [ 'tunnel', 'map', 'vxlan', 'p2p', 'proxy' ]
+    choices: [ 'tunnel', 'map', 'vxlan', 'proxy' ]
   state:
     description:
       - Indicates the desired container state are installed.
@@ -251,32 +245,6 @@ EXAMPLES = '''
     state: absent
     vxlan: vxlan1
 
-- name: create p2p instance
-  subutai:
-    network: p2p
-    state: present
-    interface: p2p-net1
-    hash: swarm-12345678-abcd-1234-efgh-123456789012
-    key: 0123456789qwertyu0123456789zxcvbn
-    ttl: 1476870551
-    localPeepIPAddr: 10.220.22.1
-    portrange: 0-65535
-
-- name: update p2p instance
-  subutai:
-    network: p2p
-    state: present
-    interface: p2p-net1
-    hash: swarm-12345678-abcd-1234-efgh-123456789012
-    key: 0123456789qwertyu0123456789zxcvbn
-    ttl: 1476870551
-
-- name: delete p2p instance
-  subutai:
-    network: p2p
-    state: absent
-    hash: swarm-12345678-abcd-1234-efgh-123456789012
-
 - name: add domain example.com to 100 vlan
   subutai:
     network: proxy
@@ -330,7 +298,7 @@ class Container():
             name=dict(type='str', required=False),
             template=dict(type='bool', required=False),
             network=dict(type='str', choices=[
-                         'tunnel', 'map', 'vxlan', 'p2p', 'proxy']),
+                         'tunnel', 'map', 'vxlan', 'proxy']),
             source=dict(type='str', required=False),
             check=dict(type='bool', required=False),
             ipaddr=dict(type='str', required=False),
@@ -371,7 +339,6 @@ class Container():
                 ["network", "tunnel", ["ipaddr"]],
                 ["network", "map", ["protocol"]],
                 ["network", "vxlan", ["vxlan"]],
-                ["network", "p2p", ["hash"]],
             ]
         )
 
@@ -416,9 +383,6 @@ class Container():
 
         if self.module.params['network'] == 'vxlan':
             self._vxlan()
-
-        if self.module.params['network'] == 'p2p':
-            self._p2p()
 
         if self.module.params['network'] == 'proxy':
             self._proxy()
@@ -690,52 +654,6 @@ class Container():
                     self._return_fail("OS Error " + str(e))
         else:
             self._return_fail(err)
-
-    def _p2p(self):
-
-        if self.module.params['state'] == "present":
-            self.args.append("-c")
-        elif self.module.params['state'] == "latest":
-            self.args.append("-u")
-        elif self.module.params['state'] == "absent":
-            self.args.append("-d")
-        else:
-            self._return_fail(
-                "State valid options are: present, absent and latest")
-
-        if self.module.params['interface']:
-            self.args.append(self.module.params['interface'])
-
-        if self.module.params['hash']:
-            self.args.append(self.module.params['hash'])
-
-        if self.module.params['key']:
-            self.args.append(self.module.params['key'])
-
-        if self.module.params['ttl']:
-            self.args.append(self.module.params['ttl'])
-
-        if self.module.params['localPeepIPAddr']:
-            self.args.append(self.module.params['localPeepIPAddr'])
-
-        if self.module.params['portrange']:
-            self.args.append(self.module.params['portrange'])
-        try:
-            err = subprocess.Popen(
-                ["/usr/bin/subutai", "p2p"] + self.args, stderr=subprocess.PIPE).stderr.read()
-            if err:
-                self.result["stderr"] = err
-                self._return_fail(err)
-            else:
-                self.result['changed'] = True
-                self._exit()
-        except OSError as e:
-            if "[Errno 2] No such file or directory" in str(e):
-                self.result['changed'] = False
-                self._return_fail("Subutai is not installed")
-            else:
-                self.result['changed'] = False
-                self._return_fail("OS Error " + str(e))
 
     def _proxy(self):
         check_args = []
