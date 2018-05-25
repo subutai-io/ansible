@@ -6,10 +6,3 @@
   gather_facts: False
 
 - import_playbook: _subutai.yml
-- import_playbook: _cleanup.yml
-- import_playbook: _clone.yml
-- import_playbook: _config.yml
-- import_playbook: _export.yml
-- import_playbook: _hostname.yml
-- import_playbook: _hub.yml
-- import_playbook: _quota.yml
